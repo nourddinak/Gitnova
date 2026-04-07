@@ -28,12 +28,10 @@
 - **Git Integration**: Simple-Git & GitHub CLI (`gh`)
 - **Styling**: Boxen, Chalk, Ora (Spinners), Gradient-String
 
----
-
-
-.  **Install Globally**:
+  **Install Globally**
    ```bash
    npm install -g gitnova
+---
 
 
 ## 🚀 Installation Instructions

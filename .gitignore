@@ -28,3 +28,6 @@ Thumbs.db
 # AI Auto-Safeguard (Codebase Scan)
 bin/
 package-lock.json
+
+# AI Auto-Safeguard (Auto Mode)
+.fromwhere/

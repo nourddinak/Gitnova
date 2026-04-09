@@ -6,6 +6,7 @@ import { ensureGitRepo } from './utils/git.js';
 import { checkGitHubAuth, loginGitHub } from './utils/github.js';
 import { ensureApiKey, getCurrentModel } from './utils/ai.js';
 import { startChatSession, autoCommitAndPush } from './chat/session.js';
+import { checkUpdate } from './utils/update.js';
 import os from 'os';
 
 export async function main() {
@@ -18,6 +19,8 @@ export async function main() {
   console.log(chalk.cyan(`   OS: ${os.type()} ${os.release()} (${os.arch()})`));
   console.log(chalk.cyan(`   Model: ${getCurrentModel()}`));
   console.log('\n');
+
+  await checkUpdate();
 
   if (os.platform() !== 'win32') {
     console.error(chalk.red('Sorry, GitNova CLI is currently only supported on Windows.'));

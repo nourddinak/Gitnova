@@ -22,11 +22,6 @@ export async function main() {
 
   await checkUpdate();
 
-  if (os.platform() !== 'win32') {
-    console.error(chalk.red('Sorry, GitNova CLI is currently only supported on Windows.'));
-    process.exit(1);
-  }
-
   // 1. Check Git
   const gitInstalled = await checkGitInstalled();
   if (!gitInstalled) {

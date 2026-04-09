@@ -35,17 +35,36 @@ export async function checkGitInstalled() {
     return true;
   } catch (error) {
     spinner.info('Git not found in standard PATH. Scanning common directories...');
-    const gitPaths = [
-      'C:\\Program Files\\Git\\cmd',
-      'C:\\Program Files (x86)\\Git\\cmd',
-      `${process.env.LOCALAPPDATA}\\Programs\\Git\\cmd`
-    ];
+    
+    let gitPaths = [];
+    let gitBinary = 'git';
+
+    if (process.platform === 'win32') {
+      gitPaths = [
+        'C:\\Program Files\\Git\\cmd',
+        'C:\\Program Files (x86)\\Git\\cmd',
+        `${process.env.LOCALAPPDATA}\\Programs\\Git\\cmd`
+      ];
+      gitBinary = 'git.exe';
+    } else {
+      gitPaths = [
+        '/usr/local/bin',
+        '/opt/homebrew/bin',
+        '/usr/bin',
+        '/bin'
+      ];
+    }
     
     for (const p of gitPaths) {
-      if (fs.existsSync(path.join(p, 'git.exe'))) {
+      if (fs.existsSync(path.join(p, gitBinary))) {
         console.log(chalk.green(`Found Git at ${p}`));
-        const added = await addToPath(p);
-        if (added) return true;
+        if (process.platform === 'win32') {
+          const added = await addToPath(p);
+          if (added) return true;
+        } else {
+          console.log(chalk.yellow(`Please add ${p} to your PATH manually.`));
+          return true; // We found it, but won't auto-add to PATH on Unix
+        }
       }
     }
     return false;
@@ -54,11 +73,27 @@ export async function checkGitInstalled() {
 
 export async function installGitDesktop() {
   console.log(chalk.yellow('\nGit was not found anywhere on your system.'));
-  const answer = await confirm({ message: 'Would you like to install Git via winget (PowerShell)?' });
+  
+  let installCmd, installArgs, msg;
+  if (process.platform === 'win32') {
+    installCmd = 'winget';
+    installArgs = ['install', '--id', 'Git.Git', '-e', '--source', 'winget'];
+    msg = 'Would you like to install Git via winget (PowerShell)?';
+  } else if (process.platform === 'darwin') {
+    installCmd = 'brew';
+    installArgs = ['install', 'git'];
+    msg = 'Would you like to install Git via Homebrew?';
+  } else {
+    installCmd = 'sudo';
+    installArgs = ['apt-get', 'install', '-y', 'git'];
+    msg = 'Would you like to install Git via apt-get?';
+  }
+
+  const answer = await confirm({ message: msg });
   if (answer) {
     console.log(chalk.cyan('Installing Git... Please wait.'));
     try {
-      await execa('winget', ['install', '--id', 'Git.Git', '-e', '--source', 'winget'], { stdio: 'inherit' });
+      await execa(installCmd, installArgs, { stdio: 'inherit' });
       console.log(chalk.green('Git installed successfully. Restarting check...'));
       return await checkGitInstalled();
     } catch (e) {
@@ -79,16 +114,35 @@ export async function checkGhInstalled() {
     return true;
   } catch (error) {
     spinner.info('GitHub CLI not found in standard PATH. Scanning common directories...');
-    const ghPaths = [
-      'C:\\Program Files\\GitHub CLI',
-      'C:\\Program Files (x86)\\GitHub CLI'
-    ];
+    
+    let ghPaths = [];
+    let ghBinary = 'gh';
+
+    if (process.platform === 'win32') {
+      ghPaths = [
+        'C:\\Program Files\\GitHub CLI',
+        'C:\\Program Files (x86)\\GitHub CLI'
+      ];
+      ghBinary = 'gh.exe';
+    } else {
+      ghPaths = [
+        '/usr/local/bin',
+        '/opt/homebrew/bin',
+        '/usr/bin',
+        '/bin'
+      ];
+    }
     
     for (const p of ghPaths) {
-      if (fs.existsSync(path.join(p, 'gh.exe'))) {
+      if (fs.existsSync(path.join(p, ghBinary))) {
         console.log(chalk.green(`Found GitHub CLI at ${p}`));
-        const added = await addToPath(p);
-        if (added) return true;
+        if (process.platform === 'win32') {
+          const added = await addToPath(p);
+          if (added) return true;
+        } else {
+          console.log(chalk.yellow(`Please add ${p} to your PATH manually.`));
+          return true;
+        }
       }
     }
     return false;
@@ -97,11 +151,27 @@ export async function checkGhInstalled() {
 
 export async function installGh() {
   console.log(chalk.yellow('\nGitHub CLI (gh) was not found on your system.'));
-  const answer = await confirm({ message: 'Would you like to install GitHub CLI via winget (PowerShell)?' });
+  
+  let installCmd, installArgs, msg;
+  if (process.platform === 'win32') {
+    installCmd = 'winget';
+    installArgs = ['install', '--id', 'GitHub.cli', '-e', '--source', 'winget'];
+    msg = 'Would you like to install GitHub CLI via winget (PowerShell)?';
+  } else if (process.platform === 'darwin') {
+    installCmd = 'brew';
+    installArgs = ['install', 'gh'];
+    msg = 'Would you like to install GitHub CLI via Homebrew?';
+  } else {
+    installCmd = 'sudo';
+    installArgs = ['apt-get', 'install', '-y', 'gh'];
+    msg = 'Would you like to install GitHub CLI via apt-get?';
+  }
+
+  const answer = await confirm({ message: msg });
   if (answer) {
     console.log(chalk.cyan('Installing GitHub CLI... Please wait.'));
     try {
-      await execa('winget', ['install', '--id', 'GitHub.cli', '-e', '--source', 'winget'], { stdio: 'inherit' });
+      await execa(installCmd, installArgs, { stdio: 'inherit' });
       console.log(chalk.green('GitHub CLI installed successfully.'));
       return await checkGhInstalled();
     } catch (e) {

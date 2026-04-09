@@ -1,6 +1,6 @@
 {
   "name": "gitnova",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "AI-powered Git and GitHub CLI tool",
   "main": "src/index.js",
   "bin": {

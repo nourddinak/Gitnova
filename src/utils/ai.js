@@ -420,9 +420,7 @@ Identify any files that are highly risky or shouldn't be pushed natively. This i
 - Large dependencies/auto-builds (node_modules, dist, builds)
 - Temporary IDE settings or local logs (.idea, .vscode, *.log)
 
-Do NOT flag standard source code folders (src/) or mandatory binary entry points (e.g., bin/).
-Do NOT flag package-lock.json or yarn.lock, as they MUST be tracked for reproducible builds.
-If you flag these critical files, you will break the repository.
+Do NOT flag standard source code folders (src/) or mandatory binary entry points (bin/) as risky, as they are essential for the project's logic and publication.
 
 File list:
 ${filesList.join('\n')}
@@ -463,8 +461,7 @@ Identify any files that are highly risky, heavily bloat the Git tree, or shouldn
 - Temporary IDE settings or local logs (.idea, .vscode, *.log)
 - OS metadata files (.DS_Store, Thumbs.db)
 
-Do NOT flag standard source code folders (src/), manifests (package.json, package-lock.json, yarn.lock), or mandatory binary entry points (e.g., bin/).
-If you flag these critical files, you will break the repository.
+Do NOT flag standard source code folders (src/), manifests (package.json), or mandatory binary entry points (bin/) as risky or bloat, as they are essential for the project's logic and publication.
 
 File list:
 ${filteredList.join('\n')}

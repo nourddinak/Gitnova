@@ -106,6 +106,16 @@ export async function ensureGitRepo() {
               const spinner = ora('Creating new GitHub repository and pushing...').start();
               try {
                   try { await git.remote(['remove', 'origin']); } catch(e) {}
+                  
+                  // Ensure there is at least one commit
+                  try {
+                      await git.log();
+                  } catch (e) {
+                      spinner.text = 'Creating initial commit...';
+                      await git.add('.');
+                      await git.commit('Initial commit');
+                  }
+
                   await execa('gh', ['repo', 'create', newRepoName, '--private', '--source=.', '--remote=origin']);
                   const branch = await getCurrentBranch() || 'master';
                   spinner.text = 'Pushing...';

@@ -16,26 +16,26 @@ import { execa } from 'execa';
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
 
-/** Checks if the user has starred nourddinak/GitNova. If not, prompts every run until they do. */
+/** Always checks GitHub API for star status — if starred, silent. If not, prompts until they do. */
 async function checkAndPromptStar() {
   const configPath = path.join(os.homedir(), '.gitnova-config.json');
   let config = {};
   try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch (e) {}
 
-  // Already confirmed starred — never show again
-  if (config.hasStarred) return;
-
+  let isStarred = false;
   try {
-    // Check via GitHub API if the user has already starred the repo
+    // Always verify with GitHub — source of truth
     const { exitCode } = await execa('gh', ['api', 'user/starred/nourddinak/GitNova'], { reject: false });
-    if (exitCode === 0) {
-      // They've starred it — save this so we never check again
-      config.hasStarred = true;
-      fs.writeFileSync(configPath, JSON.stringify(config));
-      return;
-    }
+    isStarred = exitCode === 0;
   } catch (e) {
     return; // gh not available or network issue — skip silently
+  }
+
+  if (isStarred) {
+    // Starred — update config and return silently
+    config.hasStarred = true;
+    fs.writeFileSync(configPath, JSON.stringify(config));
+    return;
   }
 
   // Not starred — show the prompt

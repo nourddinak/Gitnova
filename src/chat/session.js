@@ -463,6 +463,35 @@ export async function startChatSession() {
     chalk.gray('  Example: "commit my changes", "push to main", "status"');
   console.log(boxen(welcomeMsg, { padding: 1, margin: 1, borderStyle: 'double', borderColor: 'cyan', title: 'Welcome', titleAlignment: 'center' }));
 
+  // Rotating Pro Tips — one random tip shown above the prompt each session
+  const proTips = [
+    { icon: '🐛', tip: 'Found a bug? Type / and choose "Report a Bug" — it goes straight to the developer via GitHub.' },
+    { icon: '🔒', tip: 'Wondering what data GitNova uses? Open / → Privacy Info to see a full breakdown.' },
+    { icon: '📊', tip: 'Type / → Repo Stats (/stats) to see your total commits, lines changed, and top contributors.' },
+    { icon: 'ℹ️ ', tip: 'Use / → Repo Info (/info) to see your current branch, remote URL, and last commit.' },
+    { icon: '🗂️ ', tip: 'Use / → View Config (/config) to see your GitHub account, AI provider, and API keys.' },
+    { icon: '🌿', tip: 'Rename your branch with / → Rename Branch — it updates locally AND on GitHub automatically.' },
+    { icon: '🚀', tip: 'Run "gitnova -auto" to stage, AI-commit, and push in a single command — no prompts.' },
+    { icon: '✍️ ', tip: 'Run "gitnova -auto \\"your message\\"" to skip AI and use your own commit message.' },
+    { icon: '🤖', tip: 'Switch AI providers with / → Change Provider — choose Gemini, DeepSeek, Groq, or Claude.' },
+    { icon: '🧠', tip: 'Fine-tune the AI model with / → Change Model — each provider has multiple speed/quality options.' },
+    { icon: '🔑', tip: 'Changed your API key? Update it anytime with / → Change API Key.' },
+    { icon: '🚫', tip: 'Tired of AI flagging certain files? Use / → Manage Git Ignore to set ignore rules.' },
+    { icon: '⚙️ ', tip: 'Control how GitNova handles risky files in --auto mode with / → Auto Mode Settings.' },
+    { icon: '🧭', tip: 'Setting up a new project? Use / → Repo Onboarding to let AI summarize your whole codebase.' },
+    { icon: '💻', tip: 'Run "gitnova --version" to see your GitNova, Git, GitHub CLI and Node.js versions instantly.' },
+    { icon: '🗑️ ', tip: 'Uninstalling GitNova? Run "gitnova --uninstall" first to safely remove your saved API keys.' },
+    { icon: '🌍', tip: 'GitNova works on Windows, macOS, and Linux — AI commands adapt to your OS and shell automatically.' },
+    { icon: '🎉', tip: 'After updating GitNova, a "What\'s New" panel shows you exactly what changed — no release notes needed.' },
+    { icon: '⭐', tip: 'Enjoying GitNova? Star it on GitHub to help others find it: github.com/nourddinak/GitNova' },
+    { icon: '💬', tip: 'Just type what you want in plain English: "push my changes", "undo last commit", "show status".' },
+  ];
+
+  let tipIndex = Math.floor(Math.random() * proTips.length);
+  const formatTip = (idx) => {
+    const t = proTips[idx % proTips.length];
+    return chalk.gray(`  ${t.icon} ${chalk.italic('Pro Tip:')} ${t.tip}`);
+  };
   let autoPromptError = null;
   let chatHistory = [];
 
@@ -475,13 +504,17 @@ export async function startChatSession() {
         autoPromptError = null;
         console.log(chalk.red('\n🤖 [Auto-Healing] Sending error back to AI for analysis...'));
       } else {
-        inputResult = await askChatInput().catch((err) => {
-          if (err && (err.name === 'ExitPromptError' || (err.message && err.message.includes('force closed')))) {
-            console.log(chalk.cyan('\nGoodbye!'));
-            process.exit(0);
-          }
-          throw err;
-        });
+      // Print a new tip above the prompt on every iteration
+      process.stdout.write(formatTip(tipIndex) + '\n\n');
+      tipIndex = (tipIndex + 1) % proTips.length;
+
+      inputResult = await askChatInput().catch((err) => {
+        if (err && (err.name === 'ExitPromptError' || (err.message && err.message.includes('force closed')))) {
+          console.log(chalk.cyan('\nGoodbye!'));
+          process.exit(0);
+        }
+        throw err;
+      });
 
         if (inputResult.type === 'slash') {
           await new Promise(r => setTimeout(r, 50)); // Allow inquirer to completely release stdin lock

@@ -6,7 +6,7 @@ import { ensureGitRepo } from './utils/git.js';
 import { checkGitHubAuth, loginGitHub } from './utils/github.js';
 import { ensureApiKey, getCurrentModel } from './utils/ai.js';
 import { startChatSession, autoCommitAndPush } from './chat/session.js';
-import { checkUpdate } from './utils/update.js';
+import { checkUpdate, showChangelog } from './utils/update.js';
 import os from 'os';
 import { createRequire } from 'module';
 import { execa } from 'execa';
@@ -39,6 +39,7 @@ export async function main() {
   console.log('\n');
 
   await checkUpdate();
+  showChangelog();
 
   // 1. Check Git
   const gitInstalled = await checkGitInstalled();

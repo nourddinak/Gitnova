@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import boxen from 'boxen';
 import chalk from 'chalk';
@@ -60,3 +61,60 @@ export async function checkUpdate() {
     // Fail gracefully on timeout or other errors
   }
 }
+
+/**
+ * Shows the "What's New" changelog panel the first time the user runs
+ * a new version of GitNova. After displaying, marks the version as seen
+ * in ~/.gitnova-config.json so it never shows again until the next update.
+ */
+export function showChangelog() {
+  try {
+    const packageJsonPath = path.join(__dirname, '..', '..', 'package.json');
+    const currentVersion = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).version;
+    if (!currentVersion) return;
+
+    const configPath = path.join(os.homedir(), '.gitnova-config.json');
+    let config = {};
+    if (fs.existsSync(configPath)) {
+      try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch (e) {}
+    }
+
+    // Already shown for this version — skip
+    if (config.lastSeenVersion === currentVersion) return;
+
+    // Load CHANGELOG.json
+    const changelogPath = path.join(__dirname, '..', '..', 'CHANGELOG.json');
+    if (!fs.existsSync(changelogPath)) return;
+
+    let changelog = {};
+    try { changelog = JSON.parse(fs.readFileSync(changelogPath, 'utf8')); } catch (e) { return; }
+
+    const entry = changelog[currentVersion];
+    if (!entry || !Array.isArray(entry.notes) || entry.notes.length === 0) {
+      // No notes for this version — still mark as seen so we don't keep checking
+      config.lastSeenVersion = currentVersion;
+      fs.writeFileSync(configPath, JSON.stringify(config));
+      return;
+    }
+
+    // Build and display the panel
+    const title = entry.title || `What's New in v${currentVersion}`;
+    const body = chalk.bold(title) + '\n\n' + entry.notes.map(n => `  ${n}`).join('\n');
+
+    console.log(boxen(body, {
+      padding: 1,
+      margin: { top: 0, bottom: 1, left: 1, right: 1 },
+      borderStyle: 'double',
+      borderColor: 'magentaBright',
+      title: "🎉 What's New",
+      titleAlignment: 'center'
+    }));
+
+    // Mark as seen
+    config.lastSeenVersion = currentVersion;
+    fs.writeFileSync(configPath, JSON.stringify(config));
+  } catch (e) {
+    // Never crash startup due to changelog issues
+  }
+}
+

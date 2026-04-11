@@ -1,6 +1,6 @@
 {
-  "1.0.5": {
-    "title": "Welcome to GitNova v1.0.5!",
+  "1.0.6": {
+    "title": "Welcome to GitNova v1.0.6!",
     "notes": [
       "🟣 Claude (Anthropic) provider — claude-opus-4-5, claude-sonnet-4-5, and more",
       "🌿 /rename-branch — rename current branch locally and remotely in one step",
@@ -10,8 +10,8 @@
       "🌍 Linux & macOS support — shell commands now auto-adapt to your OS"
     ]
   },
-  "1.0.4": {
-    "title": "Welcome to GitNova v1.0.4!",
+  "1.0.5": {
+    "title": "Welcome to GitNova v1.0.5!",
     "notes": [
       "🚀 Auto Mode: gitnova --auto now stages, AI-commits, and pushes in one command",
       "🛡️ Security Guard: AI scans staging and push payloads for secrets and bloat",

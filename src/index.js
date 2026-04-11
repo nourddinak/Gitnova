@@ -8,8 +8,26 @@ import { ensureApiKey, getCurrentModel } from './utils/ai.js';
 import { startChatSession, autoCommitAndPush } from './chat/session.js';
 import { checkUpdate } from './utils/update.js';
 import os from 'os';
+import { createRequire } from 'module';
+import { execa } from 'execa';
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
 export async function main() {
+  // --version / -v: print versions and exit immediately (no banner, no startup checks)
+  if (process.argv.includes('--version') || process.argv.includes('-v')) {
+    let gitVer = 'unknown';
+    let ghVer = 'unknown';
+    try { gitVer = (await execa('git', ['--version'])).stdout.trim(); } catch (e) {}
+    try { ghVer = (await execa('gh', ['--version'])).stdout.split('\n')[0].trim(); } catch (e) {}
+    console.log(chalk.cyan(`GitNova  v${pkg.version}`));
+    console.log(chalk.gray(`Git      ${gitVer}`));
+    console.log(chalk.gray(`GitHub   ${ghVer}`));
+    console.log(chalk.gray(`Node.js  ${process.version}`));
+    console.log(chalk.gray(`OS       ${os.type()} ${os.release()} (${os.arch()})`));
+    process.exit(0);
+  }
+
   console.clear();
   // Display a cool 3D gradient banner
   const banner = figlet.textSync('GitNova', { font: '3D Diagonal' });

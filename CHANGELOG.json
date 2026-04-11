@@ -1,0 +1,23 @@
+{
+  "1.0.5": {
+    "title": "Welcome to GitNova v1.0.5!",
+    "notes": [
+      "🟣 Claude (Anthropic) provider — claude-opus-4-5, claude-sonnet-4-5, and more",
+      "🌿 /rename-branch — rename current branch locally and remotely in one step",
+      "📊 /stats — view total commits, lines added/removed, and authors",
+      "🗂️ /config — view your saved config and API keys (redacted) from the menu",
+      "💻 --version / -v flag — instantly print GitNova, Git, GitHub CLI and Node versions",
+      "🌍 Linux & macOS support — shell commands now auto-adapt to your OS"
+    ]
+  },
+  "1.0.4": {
+    "title": "Welcome to GitNova v1.0.4!",
+    "notes": [
+      "🚀 Auto Mode: gitnova --auto now stages, AI-commits, and pushes in one command",
+      "🛡️ Security Guard: AI scans staging and push payloads for secrets and bloat",
+      "🩹 Auto-Healing: Git errors are explained by AI and fixes are proposed automatically",
+      "🤖 Multi-provider: Added Groq (fast inference) as a third AI provider",
+      "🔗 Seamless GitHub setup: Missing remotes are auto-detected and fixed on startup"
+    ]
+  }
+}

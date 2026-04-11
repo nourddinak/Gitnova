@@ -494,14 +494,17 @@ export async function startChatSession() {
                   new Separator(chalk.cyan.bold('\n  --- General Tools ---  ')),
                   { name: '    ↩️  Back to Chat', value: 'cancel' },
                   { name: '    ℹ️  Repo Info (/info)', value: '/info' },
+                  { name: '    📊 Repo Stats (/stats)', value: '/stats' },
                   { name: '    🧹 Clear Terminal (/clear)', value: '/clear' },
                   { name: '    ❓ Help (/help)', value: '/help' },
                   new Separator(chalk.cyan.bold('\n  --- Configuration ---  ')),
                   { name: '    ⚙️  Auto Mode Settings (/settings)', value: '/settings' },
+                  { name: '    🗂️  View Current Config (/config)', value: '/config' },
                   { name: '    🤖 Change AI Provider (/provider)', value: '/provider' },
                   { name: '    🧠 Change AI Model (/model)', value: '/model' },
                   { name: '    🔑 Change API Key (/key)', value: '/key' },
                   { name: '    🚫 Manage Git Ignore (/ignore)', value: '/ignore' },
+                  { name: '    🌿 Rename Branch (/rename-branch)', value: '/rename-branch' },
                   new Separator(chalk.cyan.bold('\n  --- AI Workflows ---  ')),
                   { name: '    🚀 Repo Onboarding (/onboard)', value: '/onboard' },
                 ]
@@ -728,6 +731,77 @@ export async function startChatSession() {
                 scanSpinner.stop();
                 console.log(chalk.cyan('\n🚀 Repository Onboarding Summary:\n'));
                 console.log(summary + '\n');
+              } else if (cmd === '/stats') {
+                const statsSpinner = ora('Gathering repository statistics...').start();
+                try {
+                  // Commits per author
+                  let authorStats = '';
+                  try {
+                    const { stdout: shortlog } = await execa('git', ['shortlog', '-sn', '--no-merges', 'HEAD']);
+                    authorStats = shortlog.trim();
+                  } catch (e) { authorStats = 'No commits yet.'; }
+
+                  // Total lines added / deleted across all commits
+                  let linesAdded = 0;
+                  let linesDeleted = 0;
+                  try {
+                    const { stdout: numstat } = await execa('git', ['log', '--pretty=tformat:', '--shortstat']);
+                    for (const line of numstat.split('\n')) {
+                      const addM = line.match(/(\d+) insertion/);
+                      const delM = line.match(/(\d+) deletion/);
+                      if (addM) linesAdded += parseInt(addM[1], 10);
+                      if (delM) linesDeleted += parseInt(delM[1], 10);
+                    }
+                  } catch (e) {}
+
+                  // Total commits
+                  let totalCommits = '0';
+                  try { totalCommits = (await execa('git', ['rev-list', '--count', 'HEAD'])).stdout.trim(); } catch (e) {}
+
+                  statsSpinner.stop();
+
+                  const statsText =
+                    chalk.cyan.bold('📊 Repository Statistics\n') +
+                    `${chalk.bold('Total Commits:')}  ${totalCommits}\n` +
+                    `${chalk.bold('Lines Added:')}    ${chalk.green('+' + linesAdded)}\n` +
+                    `${chalk.bold('Lines Removed:')}  ${chalk.red('-' + linesDeleted)}\n\n` +
+                    chalk.bold('Commits per Author:\n') +
+                    chalk.gray(authorStats || 'No data');
+
+                  console.log(boxen(statsText, { padding: 1, margin: { top: 1, bottom: 1 }, borderStyle: 'round', borderColor: 'cyan', title: '📊 Stats' }));
+                } catch (err) {
+                  statsSpinner.fail(chalk.red('Failed to gather stats: ' + err.message));
+                }
+              } else if (cmd === '/config') {
+                const configPath = path.join(process.env.HOME || process.env.USERPROFILE || '', '.gitnova-config.json');
+                try {
+                  let configData = {};
+                  if (fs.existsSync(configPath)) {
+                    configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+                  }
+                  const display = {
+                    provider: configData.provider || 'gemini (default)',
+                    model:    configData.model    || 'gemini-2.5-flash (default)',
+                    autoIgnoreBehavior: configData.autoIgnoreBehavior || 'ask_me (default)',
+                    geminiApiKey:   configData.geminiApiKey   ? '***' + configData.geminiApiKey.slice(-4)   : '(not set)',
+                    deepseekApiKey: configData.deepseekApiKey ? '***' + configData.deepseekApiKey.slice(-4) : '(not set)',
+                    groqApiKey:     configData.groqApiKey     ? '***' + configData.groqApiKey.slice(-4)     : '(not set)',
+                    claudeApiKey:   configData.claudeApiKey   ? '***' + configData.claudeApiKey.slice(-4)   : '(not set)',
+                  };
+                  const configText =
+                    chalk.cyan.bold('🗂️  GitNova Config\n') +
+                    `${chalk.bold('Provider:')}           ${display.provider}\n` +
+                    `${chalk.bold('Model:')}              ${display.model}\n` +
+                    `${chalk.bold('Auto Mode:')}          ${display.autoIgnoreBehavior}\n` +
+                    `${chalk.bold('Gemini Key:')}         ${chalk.gray(display.geminiApiKey)}\n` +
+                    `${chalk.bold('DeepSeek Key:')}       ${chalk.gray(display.deepseekApiKey)}\n` +
+                    `${chalk.bold('Groq Key:')}           ${chalk.gray(display.groqApiKey)}\n` +
+                    `${chalk.bold('Claude Key:')}         ${chalk.gray(display.claudeApiKey)}\n` +
+                    chalk.gray(`\nConfig file: ${configPath}`);
+                  console.log(boxen(configText, { padding: 1, margin: { top: 1, bottom: 1 }, borderStyle: 'round', borderColor: 'blue', title: '🗂️ Config' }));
+                } catch (err) {
+                  console.log(chalk.red('Failed to read config: ' + err.message));
+                }
               } else if (cmd === '/settings') {
                 const currentBehavior = getAutoSettings();
                 const settingsChoices = [
@@ -750,7 +824,8 @@ export async function startChatSession() {
                 const providerChoices = [
                   { label: 'Google Gemini', value: 'gemini' },
                   { label: 'DeepSeek (Native)', value: 'deepseek' },
-                  { label: 'Groq (Fast Inference)', value: 'groq' }
+                  { label: 'Groq (Fast Inference)', value: 'groq' },
+                  { label: 'Anthropic Claude', value: 'claude' }
                 ].map(c => ({ name: c.value === currentProvider ? chalk.green(`✔ ${c.label}`) : `  ${c.label}`, value: c.value }));
                 const newProvider = await select({
                   message: 'Select AI Provider:',
@@ -783,6 +858,15 @@ export async function startChatSession() {
                     'compound-beta',
                     'compound-beta-mini'
                   ];
+                } else if (provider === 'claude') {
+                  models = [
+                    'claude-opus-4-5',
+                    'claude-sonnet-4-5',
+                    'claude-haiku-4-5',
+                    'claude-3-5-sonnet-20241022',
+                    'claude-3-5-haiku-20241022',
+                    'claude-3-opus-20240229'
+                  ];
                 } else {
                   models = [
                     'gemini-3.1-pro-preview',
@@ -804,7 +888,7 @@ export async function startChatSession() {
                   { name: activeModel && !models.includes(activeModel) ? chalk.green('✔ Custom (Type your own)') : '  Custom (Type your own)', value: 'custom' }
                 ];
                 const newModel = await select({
-                  message: `Select ${provider === 'deepseek' ? 'DeepSeek' : provider === 'groq' ? 'Groq' : 'Gemini'} Model:`,
+                  message: `Select ${provider === 'deepseek' ? 'DeepSeek' : provider === 'groq' ? 'Groq' : provider === 'claude' ? 'Claude' : 'Gemini'} Model:`,
                   choices: modelChoices,
                   default: models.includes(activeModel) ? activeModel : 'custom'
                 });
@@ -816,20 +900,66 @@ export async function startChatSession() {
 
                 setModel(finalModel);
                 console.log(chalk.green(`Model updated to ${finalModel}`));
+              } else if (cmd === '/rename-branch') {
+                try {
+                  const status = await getRepoStatus();
+                  const oldBranch = status ? status.current : null;
+                  if (!oldBranch) {
+                    console.log(chalk.red('Could not determine the current branch.'));
+                  } else {
+                    console.log(chalk.gray(`Current branch: ${oldBranch}`));
+                    const newBranchName = await input({ message: 'Enter the new branch name:' });
+                    if (!newBranchName || !newBranchName.trim()) {
+                      console.log(chalk.yellow('Aborted. No branch name provided.'));
+                    } else {
+                      const rnSpinner = ora('Renaming branch...').start();
+                      try {
+                        // 1. Rename locally
+                        await git.branch(['-m', oldBranch, newBranchName]);
+                        rnSpinner.text = 'Checking remote...';
+
+                        // 2. Try to delete the old remote branch and push new one
+                        let hadRemote = false;
+                        try {
+                          await execa('git', ['push', 'origin', '--delete', oldBranch]);
+                          hadRemote = true;
+                        } catch (e) {
+                          // old branch may not exist on remote yet — that's fine
+                        }
+
+                        rnSpinner.text = 'Pushing new branch to remote...';
+                        await git.push(['-u', 'origin', newBranchName]);
+
+                        rnSpinner.succeed(chalk.green(
+                          `Branch renamed: ${chalk.cyan(oldBranch)} → ${chalk.cyan(newBranchName)}` +
+                          (hadRemote ? ' (remote updated)' : ' (pushed to remote)')
+                        ));
+                      } catch (err) {
+                        rnSpinner.fail(chalk.red('Rename failed: ' + err.message));
+                      }
+                    }
+                  }
+                } catch (err) {
+                  console.log(chalk.red('Rename branch error: ' + err.message));
+                }
               } else if (cmd === '/clear') {
                 console.clear();
               } else if (cmd === '/help') {
                 console.log(chalk.cyan('Available commands:'));
                 console.log(' - /info    : View current repository status and GitHub details');
+                console.log(' - /stats   : Show commit count, lines changed, and authors');
+                console.log(' - /config  : View your current GitNova configuration (keys redacted)');
                 console.log(' - /settings: Configure Auto Mode and behaviors');
-                console.log(' - /provider: Switch between Gemini and DeepSeek APIs');
+                console.log(' - /provider: Switch between Gemini, DeepSeek, Groq, and Claude');
                 console.log(' - /model   : Change the AI model used by GitNova');
-                console.log(' - /key     : Change your Gemini API key');
+                console.log(' - /key     : Change your API key');
                 console.log(' - /ignore  : Manage your .gitignore settings');
+                console.log(' - /rename-branch : Rename the current branch locally and on remote');
                 console.log(' - /onboard : Generate an AI repository onboarding summary');
                 console.log(' - /clear   : Clear the terminal screen');
                 console.log(' - /help    : Show this help message');
                 console.log(chalk.cyan('\nCLI Arguments:'));
+                console.log(' - gitnova --version       : Print GitNova, git, and gh versions.');
                 console.log(' - gitnova -auto           : Stays out of chat; automatically stages, AI-commits, and pushes.');
                 console.log(' - gitnova -auto "message" : Stays out of chat; uses your custom commit message instead.');
               }

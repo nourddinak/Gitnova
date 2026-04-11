@@ -13,6 +13,7 @@ let currentProvider = process.env.AI_PROVIDER || 'gemini';
 let currentModel = process.env.AI_MODEL || process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 let currentDeepseekKey = process.env.DEEPSEEK_API_KEY || null;
 let currentGroqKey = process.env.GROQ_API_KEY || null;
+let currentClaudeKey = process.env.ANTHROPIC_API_KEY || null;
 
 try {
   const configPath = path.join(os.homedir(), '.gitnova-config.json');
@@ -22,6 +23,7 @@ try {
     if (config.model && !process.env.AI_MODEL && !process.env.GEMINI_MODEL) currentModel = config.model;
     if (config.deepseekApiKey && !currentDeepseekKey) currentDeepseekKey = config.deepseekApiKey;
     if (config.groqApiKey && !currentGroqKey) currentGroqKey = config.groqApiKey;
+    if (config.claudeApiKey && !currentClaudeKey) currentClaudeKey = config.claudeApiKey;
   }
 } catch(e) {}
 
@@ -97,6 +99,28 @@ export async function ensureApiKey() {
         currentModel = config.model;
         fs.writeFileSync(configPath, JSON.stringify(config));
         console.log(chalk.green('Groq API Key saved locally.'));
+      } else {
+        console.log(chalk.red('API Key is required. Exiting...'));
+        process.exit(1);
+      }
+    }
+    return;
+  }
+
+  if (currentProvider === 'claude') {
+    if (!currentClaudeKey && config.claudeApiKey) {
+      currentClaudeKey = config.claudeApiKey;
+    }
+    if (!currentClaudeKey) {
+      console.log(chalk.yellow('Anthropic API key is required. Get one at https://console.anthropic.com/settings/keys'));
+      currentClaudeKey = await input({ message: 'Please enter your Anthropic API Key:', type: 'password' });
+      if (currentClaudeKey) {
+        config.claudeApiKey = currentClaudeKey;
+        config.provider = currentProvider;
+        if (!config.model || !config.model.includes('claude')) config.model = 'claude-opus-4-5';
+        currentModel = config.model;
+        fs.writeFileSync(configPath, JSON.stringify(config));
+        console.log(chalk.green('Anthropic API Key saved locally.'));
       } else {
         console.log(chalk.red('API Key is required. Exiting...'));
         process.exit(1);
@@ -198,6 +222,64 @@ async function generateWithFallback(options) {
     return { text: data.choices[0].message.content };
   }
 
+  if (currentProvider === 'claude') {
+    // Claude uses a separate `system` param and only supports user/assistant roles
+    let systemPrompt = '';
+    let messages = [];
+    if (typeof options.contents === 'string') {
+      messages = [{ role: 'user', content: options.contents }];
+    } else {
+      options.contents.forEach((item, idx) => {
+        // Treat the very first user message as the system prompt
+        if (idx === 0 && item.role === 'user') {
+          systemPrompt = item.parts[0].text;
+          return;
+        }
+        const role = item.role === 'model' ? 'assistant' : item.role || 'user';
+        messages.push({ role, content: item.parts[0].text });
+      });
+    }
+    // Anthropic requires alternating user/assistant turns — dedupe consecutive same roles
+    const dedupedMessages = [];
+    for (const msg of messages) {
+      const last = dedupedMessages[dedupedMessages.length - 1];
+      if (last && last.role === msg.role) {
+        last.content += '\n' + msg.content;
+      } else {
+        dedupedMessages.push({ ...msg });
+      }
+    }
+    // Must start with a user message
+    if (dedupedMessages.length === 0 || dedupedMessages[0].role !== 'user') {
+      dedupedMessages.unshift({ role: 'user', content: 'Begin.' });
+    }
+
+    const body = {
+      model: currentModel || 'claude-opus-4-5',
+      max_tokens: 2048,
+      messages: dedupedMessages,
+    };
+    if (systemPrompt) body.system = systemPrompt;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': currentClaudeKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errObj = await response.json().catch(() => ({}));
+      throw new Error(`Anthropic API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errObj)}`);
+    }
+
+    const data = await response.json();
+    return { text: data.content[0].text };
+  }
+
   try {
     return await aiClient.models.generateContent(options);
   } catch (error) {
@@ -227,7 +309,22 @@ export async function generateCommitMessage(diff) {
 
 export async function parseIntent(userInput, contextStr = '', chatHistory = []) {
   if (!aiClient) await ensureApiKey();
-  const systemPrompt = `You are a Developer CLI Assistant. The user's OS is Windows (PowerShell). The user exclusively uses GitHub for remote Git repositories and has the GitHub CLI (gh) installed.
+
+  // Detect platform so AI-generated shell commands are correct for this OS
+  const platform = process.platform;
+  let osLabel, shellLabel;
+  if (platform === 'darwin') {
+    osLabel = 'macOS';
+    shellLabel = 'zsh';
+  } else if (platform === 'linux') {
+    osLabel = 'Linux';
+    shellLabel = 'bash';
+  } else {
+    osLabel = 'Windows';
+    shellLabel = 'PowerShell';
+  }
+
+  const systemPrompt = `You are a Developer CLI Assistant. The user's OS is ${osLabel} (${shellLabel}). The user exclusively uses GitHub for remote Git repositories and has the GitHub CLI (gh) installed.
 You MUST output either a single JSON action object OR an array of JSON action objects if multiple steps are needed to strictly fulfill the user's intent.
 Available actions:
 { "action": "STATUS" }
@@ -250,7 +347,7 @@ If the user explicitly requests to push directly, force push, or ignore remote c
 - COMMAND FIX: \`gh repo edit --visibility <public|private>\` MUST also include the flag \`--accept-visibility-change-consequences\`.
 - If a command fails and you don't know the fix, use {"action": "CHAT", "reply": "explanation of error"} to ask for user help.
 
-For ANY OTHER OS command or advanced git operation not listed above (like creating repositories, changing gitconfig, npm install), construct a RUN_COMMANDS array.
+For ANY OTHER OS command or advanced git operation not listed above (like creating repositories, changing gitconfig, npm install), construct a RUN_COMMANDS array using ${shellLabel} syntax appropriate for ${osLabel}.
 Reply ONLY with valid JSON. No markdown backticks.
 
 ${contextStr}
@@ -312,6 +409,8 @@ export function setProvider(newProvider) {
     currentModel = 'deepseek-chat';
   } else if (newProvider === 'groq') {
     currentModel = 'llama-3.3-70b-versatile';
+  } else if (newProvider === 'claude') {
+    currentModel = 'claude-opus-4-5';
   } else {
     currentModel = 'gemini-2.5-flash';
   }
@@ -378,6 +477,7 @@ export async function setApiKey() {
   let providerName;
   if (currentProvider === 'deepseek') providerName = 'DeepSeek';
   else if (currentProvider === 'groq') providerName = 'Groq';
+  else if (currentProvider === 'claude') providerName = 'Anthropic (Claude)';
   else providerName = 'Gemini';
 
   const newKey = await input({ message: `Enter new ${providerName} API Key:`, type: 'password' });
@@ -396,6 +496,9 @@ export async function setApiKey() {
     } else if (currentProvider === 'groq') {
       config.groqApiKey = newKey;
       currentGroqKey = newKey;
+    } else if (currentProvider === 'claude') {
+      config.claudeApiKey = newKey;
+      currentClaudeKey = newKey;
     } else {
       config.geminiApiKey = newKey;
       aiClient = new GoogleGenAI({ apiKey: newKey });

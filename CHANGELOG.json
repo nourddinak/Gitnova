@@ -1,4 +1,16 @@
 {
+  "1.0.7": {
+    "title": "Welcome to GitNova v1.0.7!",
+    "notes": [
+      "🐛 /bugs — Report bugs directly to the developer via GitHub Issues, one step",
+      "🔒 /privacy — View exactly what data GitNova uses and what it never collects",
+      "🗑️ --uninstall — Cleanly delete your config and API keys before uninstalling",
+      "⭐ Star prompt — GitNova asks once to star the repo until you do (takes 1 click!)",
+      "👤 Login display — Startup now shows your GitHub account and Git user identity",
+      "🗂️ /config upgrade — Now shows GitHub account, Git user, and grouped sections",
+      "🎉 What's New panel — Shows release notes once after every update"
+    ]
+  },
   "1.0.6": {
     "title": "Welcome to GitNova v1.0.6!",
     "notes": [

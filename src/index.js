@@ -8,12 +8,86 @@ import { ensureApiKey, getCurrentModel } from './utils/ai.js';
 import { startChatSession, autoCommitAndPush } from './chat/session.js';
 import { checkUpdate, showChangelog } from './utils/update.js';
 import os from 'os';
+import fs from 'fs';
+import path from 'path';
+import { confirm } from '@inquirer/prompts';
 import { createRequire } from 'module';
 import { execa } from 'execa';
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json');
 
+/** Checks if the user has starred nourddinak/GitNova. If not, prompts every run until they do. */
+async function checkAndPromptStar() {
+  const configPath = path.join(os.homedir(), '.gitnova-config.json');
+  let config = {};
+  try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch (e) {}
+
+  // Already confirmed starred — never show again
+  if (config.hasStarred) return;
+
+  try {
+    // Check via GitHub API if the user has already starred the repo
+    const { exitCode } = await execa('gh', ['api', 'user/starred/nourddinak/GitNova'], { reject: false });
+    if (exitCode === 0) {
+      // They've starred it — save this so we never check again
+      config.hasStarred = true;
+      fs.writeFileSync(configPath, JSON.stringify(config));
+      return;
+    }
+  } catch (e) {
+    return; // gh not available or network issue — skip silently
+  }
+
+  // Not starred — show the prompt
+  console.log('');
+  console.log(chalk.yellow('  ⭐ Enjoying GitNova? Star it on GitHub to help it grow!'));
+  console.log(chalk.gray('     It takes one click and means a lot.'));
+  console.log('');
+
+  try {
+    const doStar = await confirm({ message: chalk.bold('Star GitNova on GitHub now?'), default: true });
+    if (doStar) {
+      try {
+        await execa('gh', ['api', 'user/starred/nourddinak/GitNova', '-X', 'PUT']);
+        console.log(chalk.green('  ⭐ Thank you for starring GitNova! You rock.\n'));
+        config.hasStarred = true;
+        fs.writeFileSync(configPath, JSON.stringify(config));
+      } catch (e) {
+        console.log(chalk.red('  Could not star automatically. Visit: https://github.com/nourddinak/GitNova\n'));
+      }
+    } else {
+      console.log(chalk.gray('  No worries — you can star it anytime at github.com/nourddinak/GitNova\n'));
+    }
+  } catch (e) {
+    // User Ctrl+C'd the prompt — skip silently
+  }
+}
+
 export async function main() {
+  // --uninstall: clean up config file with API keys, then guide through uninstall
+  if (process.argv.includes('--uninstall')) {
+    const configPath = path.join(os.homedir(), '.gitnova-config.json');
+    console.log(chalk.yellow('\n⚠️  GitNova Uninstall Helper\n'));
+    console.log(chalk.gray(`This will delete your config file (API keys, settings):`));
+    console.log(chalk.gray(`  ${configPath}\n`));
+    try {
+      const doIt = await confirm({ message: 'Delete config file and uninstall GitNova?', default: false });
+      if (doIt) {
+        if (fs.existsSync(configPath)) {
+          fs.unlinkSync(configPath);
+          console.log(chalk.green('✔ Config file deleted.'));
+        } else {
+          console.log(chalk.gray('No config file found — nothing to delete.'));
+        }
+        console.log(chalk.cyan('\nNow run:  npm uninstall -g gitnova'));
+        console.log(chalk.gray('GitNova has been fully removed. Goodbye!\n'));
+      } else {
+        console.log(chalk.yellow('Cancelled. Nothing was deleted.'));
+      }
+    } catch (e) {}
+    process.exit(0);
+  }
+
   // --version / -v: print versions and exit immediately (no banner, no startup checks)
   if (process.argv.includes('--version') || process.argv.includes('-v')) {
     let gitVer = 'unknown';
@@ -58,6 +132,25 @@ export async function main() {
     const ghAuthed = await checkGitHubAuth();
     if (!ghAuthed) {
       await loginGitHub();
+    } else {
+      // Show who is logged in
+      try {
+        const { stdout: ghUser } = await execa('gh', ['api', 'user', '--jq', '.login'], { reject: false });
+        if (ghUser && ghUser.trim()) {
+          console.log(chalk.green(`✔ GitHub: logged in as @${ghUser.trim()}`));
+        }
+      } catch (e) {}
+      try {
+        const { stdout: gitName } = await execa('git', ['config', 'user.name'], { reject: false });
+        const { stdout: gitEmail } = await execa('git', ['config', 'user.email'], { reject: false });
+        const name = gitName ? gitName.trim() : '';
+        const email = gitEmail ? gitEmail.trim() : '';
+        if (name || email) {
+          console.log(chalk.green(`✔ Git user: ${name}${email ? ` <${email}>` : ''}`));
+        }
+      } catch (e) {}
+      // Star prompt
+      await checkAndPromptStar();
     }
   }
 

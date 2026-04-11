@@ -495,6 +495,8 @@ export async function startChatSession() {
                   { name: '    ↩️  Back to Chat', value: 'cancel' },
                   { name: '    ℹ️  Repo Info (/info)', value: '/info' },
                   { name: '    📊 Repo Stats (/stats)', value: '/stats' },
+                  { name: '    🐛 Report a Bug (/bugs)', value: '/bugs' },
+                  { name: '    🔒 Privacy Info (/privacy)', value: '/privacy' },
                   { name: '    🧹 Clear Terminal (/clear)', value: '/clear' },
                   { name: '    ❓ Help (/help)', value: '/help' },
                   new Separator(chalk.cyan.bold('\n  --- Configuration ---  ')),
@@ -779,6 +781,22 @@ export async function startChatSession() {
                   if (fs.existsSync(configPath)) {
                     configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
                   }
+
+                  // Fetch live auth info
+                  let ghLogin = '(not logged in)';
+                  let gitUserName = '';
+                  let gitUserEmail = '';
+                  try {
+                    const { stdout: u } = await execa('gh', ['api', 'user', '--jq', '.login'], { reject: false });
+                    if (u && u.trim()) ghLogin = `@${u.trim()}`;
+                  } catch (e) {}
+                  try {
+                    const { stdout: n } = await execa('git', ['config', 'user.name'], { reject: false });
+                    const { stdout: em } = await execa('git', ['config', 'user.email'], { reject: false });
+                    gitUserName = n ? n.trim() : '';
+                    gitUserEmail = em ? em.trim() : '';
+                  } catch (e) {}
+
                   const display = {
                     provider: configData.provider || 'gemini (default)',
                     model:    configData.model    || 'gemini-2.5-flash (default)',
@@ -788,16 +806,23 @@ export async function startChatSession() {
                     groqApiKey:     configData.groqApiKey     ? '***' + configData.groqApiKey.slice(-4)     : '(not set)',
                     claudeApiKey:   configData.claudeApiKey   ? '***' + configData.claudeApiKey.slice(-4)   : '(not set)',
                   };
+
                   const configText =
                     chalk.cyan.bold('🗂️  GitNova Config\n') +
+                    chalk.bold('── Accounts ──────────────────\n') +
+                    `${chalk.bold('GitHub Account:')}     ${chalk.green(ghLogin)}\n` +
+                    `${chalk.bold('Git User:')}           ${gitUserName ? chalk.white(`${gitUserName}${gitUserEmail ? ` <${gitUserEmail}>` : ''}`) : chalk.gray('(not set)')}\n` +
+                    chalk.bold('\n── AI Settings ───────────────\n') +
                     `${chalk.bold('Provider:')}           ${display.provider}\n` +
                     `${chalk.bold('Model:')}              ${display.model}\n` +
                     `${chalk.bold('Auto Mode:')}          ${display.autoIgnoreBehavior}\n` +
+                    chalk.bold('\n── API Keys ──────────────────\n') +
                     `${chalk.bold('Gemini Key:')}         ${chalk.gray(display.geminiApiKey)}\n` +
                     `${chalk.bold('DeepSeek Key:')}       ${chalk.gray(display.deepseekApiKey)}\n` +
                     `${chalk.bold('Groq Key:')}           ${chalk.gray(display.groqApiKey)}\n` +
                     `${chalk.bold('Claude Key:')}         ${chalk.gray(display.claudeApiKey)}\n` +
                     chalk.gray(`\nConfig file: ${configPath}`);
+
                   console.log(boxen(configText, { padding: 1, margin: { top: 1, bottom: 1 }, borderStyle: 'round', borderColor: 'blue', title: '🗂️ Config' }));
                 } catch (err) {
                   console.log(chalk.red('Failed to read config: ' + err.message));
@@ -942,6 +967,125 @@ export async function startChatSession() {
                 } catch (err) {
                   console.log(chalk.red('Rename branch error: ' + err.message));
                 }
+              } else if (cmd === '/bugs') {
+                console.log(chalk.cyan('\n🐛 Report a Bug to GitNova\'s developer\n'));
+                console.log(chalk.gray('Your report will be posted as a GitHub Issue on the GitNova repository.'));
+                console.log(chalk.gray('The developer will be notified and can reply to you there.\n'));
+
+                try {
+                  const bugTitle = await input({ message: 'Short bug title (e.g. "Crash when using /stats"):' });
+                  if (!bugTitle || !bugTitle.trim()) {
+                    console.log(chalk.yellow('Aborted. No title provided.'));
+                  } else {
+                    const bugDesc = await input({ message: 'Describe what happened:' });
+                    const bugSteps = await input({ message: 'What were you doing when it happened? (optional):' });
+
+                    // Auto-collect environment info
+                    let gitVer = 'unknown';
+                    let ghVer = 'unknown';
+                    try { gitVer = (await execa('git', ['--version'])).stdout.trim(); } catch (e) {}
+                    try { ghVer = (await execa('gh', ['--version'])).stdout.split('\n')[0].trim(); } catch (e) {}
+
+
+                    // Read version from global install path
+
+                    let gitnovaVersion = 'unknown';
+                    try {
+                      const { stdout: verOut } = await execa('gitnova', ['--version'], { reject: false });
+                      const match = verOut.match(/GitNova\s+v([\d.]+)/);
+                      if (match) gitnovaVersion = match[1];
+                    } catch (e) {}
+
+                    const bugBody = [
+                      '## Bug Report',
+                      '',
+                      '### Description',
+                      bugDesc || '(no description provided)',
+                      '',
+                      '### Steps / Context',
+                      bugSteps || '(not provided)',
+                      '',
+                      '### Environment',
+                      `- **GitNova:** v${gitnovaVersion}`,
+                      `- **OS:** ${process.platform} (${process.arch})`,
+                      `- **Node.js:** ${process.version}`,
+                      `- **Git:** ${gitVer}`,
+                      `- **GitHub CLI:** ${ghVer}`,
+                      '',
+                      '---',
+                      '*This report was submitted automatically via the `/bugs` command in GitNova.*'
+                    ].join('\n');
+
+                    const bugSpinner = ora('Submitting bug report to GitHub...').start();
+                    try {
+                      const { stdout: issueUrl } = await execa('gh', [
+                        'issue', 'create',
+                        '--repo', 'nourddinak/GitNova',
+                        '--title', `Bug: ${bugTitle.trim()}`,
+                        '--body', bugBody,
+                        '--label', 'bug'
+                      ]);
+                      bugSpinner.succeed(chalk.green('Bug report submitted! Thank you.'));
+                      console.log(chalk.cyan(`\nView your report: ${issueUrl.trim()}`));
+                      console.log(chalk.gray('The developer will review and reply on GitHub.'));
+                    } catch (err) {
+                      bugSpinner.fail(chalk.red('Failed to submit bug report.'));
+                      // Gracefully handle missing 'bug' label
+                      if (err.stderr && err.stderr.includes('label')) {
+                        console.log(chalk.yellow('Retrying without label tag...'));
+                        try {
+                          const { stdout: issueUrl } = await execa('gh', [
+                            'issue', 'create',
+                            '--repo', 'nourddinak/GitNova',
+                            '--title', `Bug: ${bugTitle.trim()}`,
+                            '--body', bugBody
+                          ]);
+                          console.log(chalk.green('Bug report submitted (without label).'));
+                          console.log(chalk.cyan(`\nView your report: ${issueUrl.trim()}`));
+                        } catch (e2) {
+                          console.log(chalk.red('Could not submit: ' + (e2.stderr || e2.message)));
+                          console.log(chalk.gray('You can report manually at: https://github.com/nourddinak/GitNova/issues'));
+                        }
+                      } else {
+                        console.log(chalk.red(err.stderr || err.message));
+                        console.log(chalk.gray('You can report manually at: https://github.com/nourddinak/GitNova/issues'));
+                      }
+                    }
+                  }
+                } catch (err) {
+                  if (err.name !== 'ExitPromptError') {
+                    console.log(chalk.red('Bug report cancelled.'));
+                  }
+                }
+              } else if (cmd === '/privacy') {
+                const privacyText =
+                  chalk.cyan.bold('🔒 GitNova Privacy Policy\n') +
+                  `${chalk.bold('What GitNova sends to AI providers:')}\n` +
+                  chalk.gray('  • Your git diff (code changes) when generating commit messages\n') +
+                  chalk.gray('  • File names in your repo when scanning for secrets/ignore rules\n') +
+                  chalk.gray('  • This is sent to YOUR chosen provider (Gemini, DeepSeek, Groq, or Claude)\n') +
+                  `\n${chalk.bold('What GitNova NEVER collects:')}\n` +
+                  chalk.gray('  • Nothing is sent to the GitNova developer\n') +
+                  chalk.gray('  • No telemetry, analytics, or usage tracking of any kind\n') +
+                  chalk.gray('  • No account data, file contents, or personal information\n') +
+                  `\n${chalk.bold('Bug reports (/bugs):')}\n` +
+                  chalk.gray('  • Posted to GitHub Issues using YOUR GitHub account\n') +
+                  chalk.gray('  • Includes: OS, GitNova version, Node version\n') +
+                  chalk.gray('  • Does NOT include your code, API keys, or file contents\n') +
+                  `\n${chalk.bold('Your API keys:')}\n` +
+                  chalk.gray('  • Stored locally only in ~/.gitnova-config.json\n') +
+                  chalk.gray('  • Never logged, transmitted, or shared\n') +
+                  chalk.gray('  • Run "gitnova --uninstall" to delete them completely\n') +
+                  `\n${chalk.gray('Source: https://github.com/nourddinak/GitNova')}`;
+
+                console.log(boxen(privacyText, {
+                  padding: 1,
+                  margin: { top: 1, bottom: 1 },
+                  borderStyle: 'round',
+                  borderColor: 'green',
+                  title: '🔒 Privacy',
+                  titleAlignment: 'center'
+                }));
               } else if (cmd === '/clear') {
                 console.clear();
               } else if (cmd === '/help') {
@@ -955,11 +1099,14 @@ export async function startChatSession() {
                 console.log(' - /key     : Change your API key');
                 console.log(' - /ignore  : Manage your .gitignore settings');
                 console.log(' - /rename-branch : Rename the current branch locally and on remote');
+                console.log(' - /bugs   : Report a bug directly to the GitNova developer');
                 console.log(' - /onboard : Generate an AI repository onboarding summary');
+                console.log(' - /privacy : View what data GitNova uses and never collects');
                 console.log(' - /clear   : Clear the terminal screen');
                 console.log(' - /help    : Show this help message');
                 console.log(chalk.cyan('\nCLI Arguments:'));
                 console.log(' - gitnova --version       : Print GitNova, git, and gh versions.');
+                console.log(' - gitnova --uninstall     : Cleanly remove config/API keys before uninstalling.');
                 console.log(' - gitnova -auto           : Stays out of chat; automatically stages, AI-commits, and pushes.');
                 console.log(' - gitnova -auto "message" : Stays out of chat; uses your custom commit message instead.');
               }

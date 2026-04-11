@@ -1,6 +1,6 @@
 {
   "name": "gitnova",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "AI-powered Git and GitHub CLI tool",
   "main": "src/index.js",
   "bin": {
@@ -29,7 +29,6 @@
     "@inquirer/prompts": "^8.3.2",
     "boxen": "^8.0.1",
     "chalk": "^5.6.2",
-    "commander": "^14.0.3",
     "dotenv": "^17.4.1",
     "execa": "^9.6.1",
     "figlet": "^1.11.0",

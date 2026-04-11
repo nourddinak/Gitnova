@@ -76,7 +76,7 @@ export async function ensureGitRepo() {
                  await git.remote(['add', 'origin', finalUrl]);
                  await git.fetch(['origin']);
                  
-                 let defaultBranch = 'master';
+                 let defaultBranch = 'main';
                  try {
                      const { stdout: branchOut } = await execa('git', ['ls-remote', '--symref', 'origin', 'HEAD']);
                      const match = branchOut.match(/ref: refs\/heads\/([^\s]+)\s+HEAD/);
@@ -117,7 +117,7 @@ export async function ensureGitRepo() {
                   }
 
                   await execa('gh', ['repo', 'create', newRepoName, '--private', '--source=.', '--remote=origin']);
-                  const branch = await getCurrentBranch() || 'master';
+                  const branch = await getCurrentBranch() || 'main';
                   spinner.text = 'Pushing...';
                   await git.push(['-u', 'origin', branch]);
                   spinner.succeed(chalk.green(`Created private repo '${newRepoName}' on GitHub and pushed your code!`));

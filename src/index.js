@@ -6,7 +6,7 @@ import { ensureGitRepo } from './utils/git.js';
 import { checkGitHubAuth, loginGitHub } from './utils/github.js';
 import { ensureApiKey, getCurrentModel } from './utils/ai.js';
 import { startChatSession, autoCommitAndPush } from './chat/session.js';
-import { checkUpdate, showChangelog, getNpmDownloads } from './utils/update.js';
+import { checkUpdate, showChangelog, getNpmDownloads, fetchNotice } from './utils/update.js';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
@@ -111,7 +111,8 @@ export async function main() {
   const [, , downloadsCount] = await Promise.allSettled([
     checkUpdate(),
     Promise.resolve(showChangelog()),
-    getNpmDownloads()
+    getNpmDownloads(),
+    fetchNotice()
   ]);
   const downloads = downloadsCount.status === 'fulfilled' && downloadsCount.value
     ? chalk.gray(`  📦 ${downloadsCount.value.toLocaleString()} downloads last month`)
@@ -175,7 +176,14 @@ export async function main() {
     }
     await autoCommitAndPush(customMessage);
   } else {
+    // Capture an optional inline prompt: gitnova "do something"
+    // Any non-flag argument that isn't consumed by --auto is treated as the first prompt
+    const knownFlags = ['--version', '-v', '--uninstall'];
+    const initialPrompt = process.argv.slice(2).find(
+      arg => !arg.startsWith('-') && !knownFlags.includes(arg)
+    ) || null;
+
     // 5. Start REPL
-    await startChatSession();
+    await startChatSession(initialPrompt);
   }
 }

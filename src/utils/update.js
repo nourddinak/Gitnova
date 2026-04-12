@@ -138,3 +138,81 @@ export async function getNpmDownloads() {
     return null;
   }
 }
+
+/**
+ * Fetches notices.json from the live GitHub repo and displays any active
+ * notice the user hasn't seen yet. Seen notice IDs are stored in
+ * ~/.gitnova-config.json so each notice only ever shows once per user.
+ *
+ * To push a message to all users: edit notices.json and commit to GitHub.
+ * Set notice to null to clear it. No npm publish required.
+ *
+ * Notice format:
+ * {
+ *   "notice": {
+ *     "id": "unique-id-for-this-message",
+ *     "type": "info" | "warning" | "critical",
+ *     "message": "Your message here",
+ *     "expires": "2025-12-31"  // optional ISO date — notice is hidden after this
+ *   }
+ * }
+ */
+export async function fetchNotice() {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    const res = await fetch(
+      'https://raw.githubusercontent.com/nourddinak/GitNova/main/notices.json',
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const notice = data.notice;
+
+    // No active notice
+    if (!notice || !notice.id || !notice.message) return;
+
+    // Check expiry
+    if (notice.expires) {
+      const expiry = new Date(notice.expires);
+      if (!isNaN(expiry.getTime()) && new Date() > expiry) return;
+    }
+
+    // Check if already seen
+    const configPath = path.join(os.homedir(), '.gitnova-config.json');
+    let config = {};
+    if (fs.existsSync(configPath)) {
+      try { config = JSON.parse(fs.readFileSync(configPath, 'utf8')); } catch (e) {}
+    }
+
+    const seenNotices = Array.isArray(config.seenNotices) ? config.seenNotices : [];
+    if (seenNotices.includes(notice.id)) return;
+
+    // Pick border colour by type
+    const borderColorMap = { warning: 'yellow', critical: 'red', info: 'cyan' };
+    const borderColor = borderColorMap[notice.type] || 'cyan';
+    const titleMap = { warning: '⚠️  Notice', critical: '🚨 Important', info: 'ℹ️  Notice' };
+    const title = titleMap[notice.type] || 'ℹ️  Notice';
+
+    console.log(boxen(notice.message, {
+      padding: 1,
+      margin: { top: 0, bottom: 1, left: 1, right: 1 },
+      borderStyle: 'round',
+      borderColor,
+      title,
+      titleAlignment: 'center'
+    }));
+
+    // Mark as seen
+    seenNotices.push(notice.id);
+    config.seenNotices = seenNotices;
+    fs.writeFileSync(configPath, JSON.stringify(config));
+  } catch (e) {
+    // Never crash startup due to notice fetch issues
+  }
+}
+

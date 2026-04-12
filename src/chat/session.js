@@ -450,7 +450,7 @@ export async function autoCommitAndPush(customMessage) {
   }
 }
 
-export async function startChatSession() {
+export async function startChatSession(initialPrompt = null) {
   const welcomeMsg =
     chalk.cyan('GitNova AI Assistant initialized.\n') +
     chalk.gray('Developed by nourddinak\n\n') +
@@ -494,6 +494,7 @@ export async function startChatSession() {
   };
   let autoPromptError = null;
   let chatHistory = [];
+  let isFirstPrompt = !!initialPrompt;
 
   while (true) {
     let userInput;
@@ -503,6 +504,13 @@ export async function startChatSession() {
         userInput = autoPromptError;
         autoPromptError = null;
         console.log(chalk.red('\n🤖 [Auto-Healing] Sending error back to AI for analysis...'));
+      } else if (isFirstPrompt) {
+        // Fire the inline prompt passed from the command line without waiting for input
+        isFirstPrompt = false;
+        userInput = initialPrompt;
+        process.stdout.write(formatTip(tipIndex) + '\n\n');
+        tipIndex = (tipIndex + 1) % proTips.length;
+        console.log(chalk.cyan(`╭─ 🚀 GitNova\n╰─❯ `) + initialPrompt + '\n');
       } else {
       // Print a new tip above the prompt on every iteration
       process.stdout.write(formatTip(tipIndex) + '\n\n');

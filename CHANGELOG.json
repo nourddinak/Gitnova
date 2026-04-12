@@ -1,4 +1,10 @@
 {
+  "1.0.8": {
+    "title": "Welcome to GitNova v1.0.8!",
+    "notes": [
+      "⚡ Inline prompt — run \"gitnova \\\"your request\\\"\" to fire a prompt the moment the session starts, no typing needed"
+    ]
+  },
   "1.0.7": {
     "title": "Welcome to GitNova v1.0.7!",
     "notes": [

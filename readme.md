@@ -114,6 +114,20 @@ Launches the full interactive AI assistant. You'll see the animated banner, vers
 
 ---
 
+### `gitnova "<your prompt>"` — Inline First Prompt
+
+```bash
+gitnova "read my code and tell me what it does"
+gitnova "create a branch called feature-login"
+gitnova "what files have I changed?"
+```
+
+Pass any text right after `gitnova` and it becomes **the first message** sent to the AI the moment the session starts — no waiting, no typing. GitNova boots up normally (banner, auth checks, pro tip) then immediately fires your prompt as if you typed it yourself.
+
+Works with anything the chat session supports — Git commands, questions, tasks, or anything else.
+
+---
+
 ### `gitnova --auto` — Auto Mode
 
 ```bash

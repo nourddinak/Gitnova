@@ -219,6 +219,7 @@ GitNova uses your active AI provider to understand intent. It is also aware of:
 | `"switch to main"` | `git checkout main` |
 | `"install dependencies"` (or any non-Git task) | AI proposes shell commands appropriate for your OS. You review and confirm before they run. |
 | `"explain this error"` / any question | AI answers conversationally |
+| **Anything else — just ask!** | Not sure if GitNova can do it? Try it anyway. The AI will find a way to get it done for you — whether that means running shell commands, fixing errors, or walking you through it step by step. |
 
 #### Auto-Healing Loop
 

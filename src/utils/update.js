@@ -118,3 +118,23 @@ export function showChangelog() {
   }
 }
 
+
+/**
+ * Fetches the last-month download count for gitnova from the npm downloads API.
+ * Returns the count as a number, or null on failure. Never throws.
+ */
+export async function getNpmDownloads() {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+    const res = await fetch('https://api.npmjs.org/downloads/point/last-month/gitnova', {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data.downloads === 'number' ? data.downloads : null;
+  } catch (e) {
+    return null;
+  }
+}

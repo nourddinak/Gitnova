@@ -6,7 +6,7 @@ import { ensureGitRepo } from './utils/git.js';
 import { checkGitHubAuth, loginGitHub } from './utils/github.js';
 import { ensureApiKey, getCurrentModel } from './utils/ai.js';
 import { startChatSession, autoCommitAndPush } from './chat/session.js';
-import { checkUpdate, showChangelog } from './utils/update.js';
+import { checkUpdate, showChangelog, getNpmDownloads } from './utils/update.js';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
@@ -107,13 +107,20 @@ export async function main() {
   const banner = figlet.textSync('GitNova', { font: '3D Diagonal' });
   console.log(gradient.pastel.multiline(banner));
   
-  // Display system and model info
-  console.log(chalk.cyan(`   OS: ${os.type()} ${os.release()} (${os.arch()})`));
+  // Display system and model info + npm downloads (fetched in parallel)
+  const [, , downloadsCount] = await Promise.allSettled([
+    checkUpdate(),
+    Promise.resolve(showChangelog()),
+    getNpmDownloads()
+  ]);
+  const downloads = downloadsCount.status === 'fulfilled' && downloadsCount.value
+    ? chalk.gray(`  📦 ${downloadsCount.value.toLocaleString()} downloads last month`)
+    : '';
+
+  console.log(chalk.cyan(`   OS: ${os.type()} ${os.release()} (${os.arch()})`) + (downloads ? `   ${downloads}` : ''));
   console.log(chalk.cyan(`   Model: ${getCurrentModel()}`));
   console.log('\n');
 
-  await checkUpdate();
-  showChangelog();
 
   // 1. Check Git
   const gitInstalled = await checkGitInstalled();

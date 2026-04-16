@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    
+    <!-- Core SEO & Deep Long-Tail Keywords -->
+    <title>GitNova — AI-Powered Git & GitHub CLI Tool | Automate Your Commits</title>
+    <meta name="description" content="GitNova turns Git into a conversation. Powerful natural language Git, auto mode, automated AI commit generation, security scanning, and multi-provider AI support (Gemini, Claude, DeepSeek)." />
+    <meta name="keywords" content="GitNova, git, github, cli, developer tools, ai coding assistant, natural language git, auto commit generator, ai commit messages, semantic commits, github automation, terminal tools, programming automation, software development, git workflow, groq, gemini, claude, deepseek" />
+    <meta name="author" content="GitNova" />
+    <meta name="publisher" content="GitNova" />
+    
+    <!-- Advanced Bot Directives for Maximum Indexing -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Canonical URL & Localization -->
+    <link rel="canonical" href="https://github.com/nourddinak/GitNova" />
+    <link rel="alternate" hreflang="en" href="https://github.com/nourddinak/GitNova" />
+    <link rel="alternate" hreflang="x-default" href="https://github.com/nourddinak/GitNova" />
+
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="./logo.png" />
+    <link rel="apple-touch-icon" href="./logo.png" />
+    <link rel="shortcut icon" href="./logo.png" />
+
+    <!-- Resource Hints for Speed (Speed = SEO) -->
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://code.iconify.design">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
+    <!-- Open Graph / Web & Discord / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://github.com/nourddinak/GitNova" />
+    <meta property="og:title" content="GitNova — AI-Powered Git & GitHub CLI" />
+    <meta property="og:description" content="Type plain English, use power menus, and run 1-command auto pushes with built-in AI commit generation and security scanning. Stop fighting git, start talking." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/nourddinak/GitNova/main/logo.png" />
+    <meta property="og:image:alt" content="GitNova - The AI-Powered Git CLI" />
+    <meta property="og:site_name" content="GitNova" />
+
+    <!-- Twitter / X Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://github.com/nourddinak/GitNova" />
+    <meta name="twitter:title" content="GitNova — Stop Fighting Git, Start Talking" />
+    <meta name="twitter:description" content="Upgrade your terminal workflow with AI auto-commits, natural language commands, and built-in remote syncing. Install via npm!" />
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/nourddinak/GitNova/main/logo.png" />
+    <meta name="twitter:image:alt" content="GitNova Logo and Banner" />
+    
+    <!-- JSON-LD Structured Data: Core Software Application -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "GitNova",
+      "operatingSystem": "Windows, macOS, Linux",
+      "applicationCategory": "DeveloperApplication",
+      "description": "An AI-powered Git and GitHub CLI tool supporting natural language commands, automatic commit generation, and safety scanning.",
+      "url": "https://github.com/nourddinak/GitNova",
+      "image": "https://raw.githubusercontent.com/nourddinak/GitNova/main/logo.png",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
+    <!-- JSON-LD Structured Data: FAQ Page for "People Also Ask" Rich Results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is GitNova?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "GitNova is an AI-powered Git and GitHub CLI tool that allows developers to manage their code repositories using natural language commands, featuring automated AI commit messages and built-in security scanning."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does GitNova's Auto Mode work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "By running 'gitnova --auto', the tool automatically scans your codebase for risky files, stages all safe changes, generates a precise semantic commit message using AI, and pushes directly to your remote branch in exactly one command."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which AI models does GitNova support?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "GitNova supports seamless switching between Google Gemini, Anthropic Claude, Groq, and DeepSeek models directly from your terminal."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glow-bg {
+            background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.05) 25%, transparent 50%);
+        }
+
+        .surface-glass {
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .surface-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .surface-card:hover {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        details > summary {
+            list-style: none;
+        }
+
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .timeline-line {
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #ffffff, #a1a1aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .terminal-tab.active {
+            background: rgba(255,255,255,0.08);
+            color: rgb(244 244 245);
+        }
+
+        .terminal-panel {
+            display: none;
+        }
+
+        .terminal-panel.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="text-zinc-400 antialiased selection:bg-zinc-800 selection:text-zinc-100 overflow-x-hidden relative">
+    <div class="fixed inset-0 pointer-events-none z-[-1] glow-bg"></div>
+    <div class="fixed inset-0 pointer-events-none z-[-1] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wMykiLz48L3N2Zz4=')] [mask-image:linear-gradient(to_bottom,black_20%,transparent_80%)]"></div>
+
+    <header class="fixed top-0 left-0 right-0 z-50 flex justify-center pt-6 px-6 pointer-events-none">
+        <nav class="surface-glass rounded-full px-6 py-3 flex items-center justify-between w-full max-w-6xl pointer-events-auto">
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold tracking-[0.22em] text-zinc-100 uppercase">GitNova</span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm text-zinc-500 font-medium">
+                <a href="#features" class="hover:text-zinc-200 transition-colors">Features</a>
+                <a href="#workflow" class="hover:text-zinc-200 transition-colors">Workflow</a>
+                <a href="#security" class="hover:text-zinc-200 transition-colors">Security</a>
+                <a href="#providers" class="hover:text-zinc-200 transition-colors">Providers</a>
+                <a href="#changelog" class="hover:text-zinc-200 transition-colors">Changelog</a>
+            </div>
+            <a href="https://github.com/nourddinak/GitNova" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-zinc-100 hover:text-white transition-colors flex items-center gap-2">
+                <iconify-icon icon="solar:github-linear" class="text-lg" stroke-width="1.5"></iconify-icon>
+                <span class="hidden sm:inline">View on GitHub</span>
+            </a>
+        </nav>
+    </header>
+
+    <main class="pt-32 sm:pt-44 pb-28">
+        <section class="max-w-6xl mx-auto px-6 flex flex-col items-center text-center relative z-10 mb-28">
+            <div class="hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.02] text-xs font-medium text-zinc-300 mb-10">
+                <span class="relative flex h-1.5 w-1.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+                </span>
+                <span>Natural language Git. Auto mode. Built-in safety.</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-medium tracking-tighter text-zinc-100 mb-8 leading-[1.05] max-w-5xl text-gradient">
+                Git and GitHub, turned into a conversation.
+            </h1>
+
+            <p class="text-lg text-zinc-400 max-w-3xl mb-12 leading-relaxed font-normal">
+                GitNova lets you type plain English, press <span class="font-mono text-zinc-300">/</span> for a power menu, or run one command to auto-commit and push — all with AI commit generation, security scanning, repo onboarding, and multi-provider model support.
+            </p>
+
+            <div class="hero-buttons flex flex-col sm:flex-row items-center gap-4 mb-24 w-full sm:w-auto">
+                <a href="https://www.npmjs.com/package/gitnova" target="_blank" rel="noopener noreferrer" class="h-12 px-8 rounded-full bg-zinc-100 text-zinc-950 text-sm font-medium flex items-center justify-center hover:bg-white transition-all w-full sm:w-auto shadow-[0_0_30px_-5px_rgba(255,255,255,0.3)]">
+                    Install from npm
+                </a>
+                <div class="h-12 px-6 rounded-full surface-glass border border-white/10 flex items-center justify-between gap-6 w-full sm:w-auto group">
+                    <span id="install-command" class="text-zinc-300 font-mono text-xs">npm install -g gitnova</span>
+                    <button id="copy-install" class="text-zinc-500 hover:text-zinc-200 transition-colors flex items-center" aria-label="Copy install command">
+                        <iconify-icon icon="solar:copy-linear" class="text-base" stroke-width="1.5"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full max-w-5xl surface-card rounded-2xl overflow-hidden relative text-left">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.01] gap-4">
+                    <div class="flex gap-2 pl-2">
+                        <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                    </div>
+                    <div class="flex bg-black/50 p-1 rounded-lg border border-white/5 self-start sm:self-auto">
+                        <button class="terminal-tab active px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200" data-view="traditional">Traditional Git</button>
+                        <button class="terminal-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200" data-view="nova">GitNova</button>
+                        <button class="terminal-tab px-4 py-1.5 text-xs font-medium rounded-md transition-all text-zinc-400 hover:text-zinc-200" data-view="auto">Auto Mode</button>
+                    </div>
+                </div>
+
+                <!-- Terminal Content -->
+                <div class="p-6 md:p-8 font-mono text-sm leading-loose min-h-[320px] overflow-y-auto">
+                    <div class="terminal-panel active text-zinc-300" data-panel="traditional">
+                        <div class="flex items-center gap-3 text-zinc-500 mb-2">
+                            <span># Manual add, commit, then push</span>
+                        </div>
+                        <div><span class="text-blue-400">~</span> <span class="text-zinc-500">❯</span> git add .</div>
+                        <div><span class="text-blue-400">~</span> <span class="text-zinc-500">❯</span> git commit -m "feat: add dark mode toggle"</div>
+                        <div class="text-zinc-500">[main 8a92f1b] feat: add dark mode toggle</div>
+                        <div class="text-zinc-500"> 7 files changed, 132 insertions(+), 18 deletions(-)</div>
+                        <div><span class="text-blue-400">~</span> <span class="text-zinc-500">❯</span> git push origin main</div>
+                        <div class="text-zinc-500">Enumerating objects: 11, done.</div>
+                        <div class="text-zinc-500">Counting objects: 100% (11/11), done.</div>
+                        <div class="text-zinc-500">Writing objects: 100% (7/7), 1.12 KiB | done.</div>
+                        <div class="mt-4"><span class="text-blue-400">~</span> <span class="text-zinc-500">❯</span> <span class="cursor-blink inline-block w-2 h-4 bg-zinc-500 align-middle"></span></div>
+                    </div>
+
+                    <div class="terminal-panel text-zinc-300" data-panel="nova">
+                        <div class="flex items-center gap-3 text-zinc-500 mb-2">
+                            <span># Interactive mode with natural language</span>
+                        </div>
+                        <div class="text-zinc-500">╭─ 🚀 GitNova</div>
+                        <div class="mb-3 text-zinc-500">╰─❯ create a branch called feature-login</div>
+                        <div class="pl-4 border-l border-white/10 space-y-2 text-xs">
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:check-circle-linear"></iconify-icon> Detected Git repository and active branch</div>
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:check-circle-linear"></iconify-icon> Understood intent: create and switch to a new branch</div>
+                            <div class="flex items-center gap-2 text-zinc-100 bg-white/[0.03] py-1 px-3 rounded border border-white/5 inline-flex mt-1 mb-2">git checkout -b feature-login</div>
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:check-circle-linear"></iconify-icon> Switched to <span class="text-zinc-200">feature-login</span></div>
+                        </div>
+                        <div class="mt-4 text-zinc-500">╭─ 🚀 GitNova</div>
+                        <div><span class="text-purple-400">╰─❯</span> <span class="cursor-blink inline-block w-2 h-4 bg-zinc-500 align-middle"></span></div>
+                    </div>
+
+                    <div class="terminal-panel text-zinc-300" data-panel="auto">
+                        <div class="flex items-center gap-3 text-zinc-500 mb-2">
+                            <span># One command: scan, stage, commit, push</span>
+                        </div>
+                        <div><span class="text-emerald-400">~</span> <span class="text-zinc-500">❯</span> gitnova --auto</div>
+                        <div class="mt-4 pl-4 border-l border-white/10 space-y-2 text-xs">
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:shield-check-linear"></iconify-icon> Running AI security scan on root-level files</div>
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:add-circle-linear"></iconify-icon> Staged all changes with <span class="text-zinc-200">git add .</span></div>
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:stars-linear"></iconify-icon> Generated commit message from staged diff</div>
+                            <div class="flex items-center gap-2 text-zinc-100 bg-white/[0.03] py-1 px-3 rounded border border-white/5 inline-flex mt-1 mb-2">feat: add onboarding flow and improve repo scan output</div>
+                            <div class="flex items-center gap-2 text-zinc-400"><iconify-icon icon="solar:upload-linear"></iconify-icon> Pushed to <span class="text-zinc-200">origin/current-branch</span></div>
+                        </div>
+                        <div class="mt-4"><span class="text-emerald-400">~</span> <span class="text-zinc-500">❯</span> <span class="cursor-blink inline-block w-2 h-4 bg-zinc-500 align-middle"></span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="providers" class="border-y border-white/5 bg-white/[0.01] py-8 mb-28 overflow-hidden flex flex-col items-center">
+            <p class="text-xs font-medium tracking-widest text-zinc-600 uppercase mb-6 text-center">Switch providers whenever you want</p>
+            <div class="flex flex-wrap justify-center gap-8 md:gap-16 px-6 max-w-5xl mx-auto opacity-75">
+                <span class="text-sm font-medium text-zinc-400 flex items-center gap-2"><iconify-icon icon="solar:cpu-linear"></iconify-icon> Google Gemini</span>
+                <span class="text-sm font-medium text-zinc-400 flex items-center gap-2"><iconify-icon icon="solar:cpu-linear"></iconify-icon> DeepSeek</span>
+                <span class="text-sm font-medium text-zinc-400 flex items-center gap-2"><iconify-icon icon="solar:cpu-linear"></iconify-icon> Groq</span>
+                <span class="text-sm font-medium text-zinc-400 flex items-center gap-2"><iconify-icon icon="solar:cpu-linear"></iconify-icon> Anthropic Claude</span>
+            </div>
+        </section>
+
+        <section id="features" class="max-w-6xl mx-auto px-6 mb-28 md:mb-40">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-start">
+                <div class="space-y-4">
+                    <h2 class="text-3xl font-medium tracking-tighter text-zinc-100 mb-8">What the docs promise,<br />now reflected in the page.</h2>
+
+                    <details class="group surface-card rounded-2xl p-6 cursor-pointer" open>
+                        <summary class="flex items-center justify-between font-medium text-zinc-100 outline-none">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
+                                    <iconify-icon icon="solar:magic-stick-3-linear"></iconify-icon>
+                                </div>
+                                Natural Language Git
+                            </div>
+                            <iconify-icon icon="solar:alt-arrow-down-linear" class="text-zinc-500 group-open:rotate-180 transition-transform duration-300"></iconify-icon>
+                        </summary>
+                        <div class="pt-6 mt-2 border-t border-white/5 text-zinc-400 text-sm leading-relaxed">
+                            Type things like <span class="text-zinc-200 font-mono">"push my changes"</span>, <span class="text-zinc-200 font-mono">"create branch hotfix"</span>, or <span class="text-zinc-200 font-mono">"undo last commit"</span>. GitNova maps intent to the right Git action automatically.
+                        </div>
+                    </details>
+
+                    <details class="group surface-card rounded-2xl p-6 cursor-pointer">
+                        <summary class="flex items-center justify-between font-medium text-zinc-100 outline-none">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
+                                    <iconify-icon icon="solar:shield-check-linear"></iconify-icon>
+                                </div>
+                                Security Scanning
+                            </div>
+                            <iconify-icon icon="solar:alt-arrow-down-linear" class="text-zinc-500 group-open:rotate-180 transition-transform duration-300"></iconify-icon>
+                        </summary>
+                        <div class="pt-6 mt-2 border-t border-white/5 text-zinc-400 text-sm leading-relaxed">
+                            GitNova scans for risky files before staging and before pushing. It catches things like <span class="font-mono text-zinc-200">.env</span>, databases, <span class="font-mono text-zinc-200">node_modules</span>, and other files you probably should not send.
+                        </div>
+                    </details>
+
+                    <details class="group surface-card rounded-2xl p-6 cursor-pointer">
+                        <summary class="flex items-center justify-between font-medium text-zinc-100 outline-none">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
+                                    <iconify-icon icon="solar:medical-kit-linear"></iconify-icon>
+                                </div>
+                                AI Auto-Healing
+                            </div>
+                            <iconify-icon icon="solar:alt-arrow-down-linear" class="text-zinc-500 group-open:rotate-180 transition-transform duration-300"></iconify-icon>
+                        </summary>
+                        <div class="pt-6 mt-2 border-t border-white/5 text-zinc-400 text-sm leading-relaxed">
+                            When Git commands fail, GitNova captures the error output, sends it back through the AI loop, and proposes a corrective action instead of leaving you stuck.
+                        </div>
+                    </details>
+
+                    <details class="group surface-card rounded-2xl p-6 cursor-pointer">
+                        <summary class="flex items-center justify-between font-medium text-zinc-100 outline-none">
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
+                                    <iconify-icon icon="solar:book-bookmark-linear"></iconify-icon>
+                                </div>
+                                Repo Onboarding
+                            </div>
+                            <iconify-icon icon="solar:alt-arrow-down-linear" class="text-zinc-500 group-open:rotate-180 transition-transform duration-300"></iconify-icon>
+                        </summary>
+                        <div class="pt-6 mt-2 border-t border-white/5 text-zinc-400 text-sm leading-relaxed">
+                            Use <span class="font-mono text-zinc-200">/onboard</span> to scan a codebase and get a quick explanation of what the project does, how it is structured, and where to start reading.
+                        </div>
+                    </details>
+                </div>
+
+                <div class="hidden md:flex relative h-full min-h-[440px] w-full items-center justify-center">
+                    <div class="absolute inset-0 surface-card rounded-3xl overflow-hidden flex items-center justify-center p-8">
+                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,transparent_70%)]"></div>
+                        <div class="relative w-full max-w-md flex flex-col gap-4 z-10">
+                            <div class="surface-glass rounded-xl p-4 flex items-center gap-4 opacity-60 transform -translate-x-4">
+                                <iconify-icon icon="solar:folder-open-linear" class="text-xl text-zinc-500"></iconify-icon>
+                                <div>
+                                    <div class="text-xs text-zinc-300">Project state</div>
+                                    <div class="text-[11px] text-zinc-500">status, branch, changed files</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-center my-2">
+                                <div class="w-px h-8 bg-gradient-to-b from-zinc-700 to-transparent"></div>
+                            </div>
+                            <div class="surface-glass rounded-xl p-5 flex flex-col gap-3 shadow-2xl border border-white/10">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <iconify-icon icon="solar:stars-linear" class="text-zinc-300"></iconify-icon>
+                                    <span class="text-xs font-medium text-zinc-200">AI intent + safety analysis</span>
+                                </div>
+                                <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full w-4/5 bg-zinc-400 rounded-full"></div></div>
+                                <div class="h-1.5 w-3/4 bg-white/10 rounded-full"></div>
+                                <div class="h-1.5 w-2/3 bg-white/10 rounded-full"></div>
+                            </div>
+                            <div class="flex items-center justify-center my-2">
+                                <div class="w-px h-8 bg-gradient-to-t from-zinc-700 to-transparent"></div>
+                            </div>
+                            <div class="surface-glass rounded-xl p-4 flex items-center gap-4 opacity-60 transform translate-x-4">
+                                <iconify-icon icon="solar:cloud-upload-linear" class="text-xl text-zinc-500"></iconify-icon>
+                                <div>
+                                    <div class="text-xs text-zinc-300">Commit, sync, onboard, heal</div>
+                                    <div class="text-[11px] text-zinc-500">Git actions with reviewable output</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="fix-git-problems" class="max-w-5xl mx-auto px-6 mb-28 md:mb-40">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-medium tracking-tighter text-zinc-100 mb-4">Fix Git problems without leaving the terminal.</h2>
+                <p class="text-base text-zinc-400 max-w-2xl mx-auto">The docs describe an AI auto-healing loop. This panel now shows that behavior instead of generic conflict copy.</p>
+            </div>
+
+            <div class="surface-card rounded-3xl p-1 overflow-hidden">
+                <div class="bg-black rounded-[23px] overflow-hidden">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-white/[0.01]">
+                        <div class="text-xs font-mono text-zinc-500">push-rejected.txt</div>
+                        <div class="text-xs text-zinc-500 flex items-center gap-2"><iconify-icon icon="solar:shield-warning-linear"></iconify-icon> Auto-Healing Active</div>
+                    </div>
+                    <div class="p-6 md:p-10 font-mono text-sm">
+                        <div class="bg-red-500/10 text-red-400 p-4 rounded-lg mb-6 border border-red-500/20 leading-relaxed">
+                            ! [rejected] main -&gt; main (fetch first)<br>
+                            error: failed to push some refs to 'origin'<br>
+                            hint: Updates were rejected because the remote contains work that you do not have locally.
+                        </div>
+
+                        <div class="mt-8 border-t border-white/10 pt-8">
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <iconify-icon icon="solar:stars-linear" class="text-zinc-300"></iconify-icon>
+                                </div>
+                                <div>
+                                    <div class="text-zinc-200 font-sans text-base mb-2">Remote has newer commits. Safe next step: run a rebase sync, then push again. GitNova can do that for you without force-pushing.</div>
+                                    <div class="font-mono text-xs bg-white/10 px-3 py-2 rounded-lg inline-flex border border-white/5 text-zinc-200">git pull --rebase origin main &amp;&amp; git push origin main</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="max-w-4xl mx-auto px-6 mb-28 md:mb-40">
+            <h2 class="text-3xl font-medium tracking-tighter text-zinc-100 mb-16 text-center">How it works</h2>
+            <div class="relative">
+                <div class="absolute left-[27px] top-4 bottom-4 w-px timeline-line"></div>
+
+                <div class="flex gap-8 mb-16 relative">
+                    <div class="w-14 h-14 rounded-full bg-black border border-white/10 flex items-center justify-center flex-shrink-0 z-10 shadow-[0_0_15px_rgba(255,255,255,0.05)]"><span class="text-sm font-mono text-zinc-300">01</span></div>
+                    <div class="pt-3">
+                        <h3 class="text-lg font-medium text-zinc-100 mb-2">Install GitNova</h3>
+                        <p class="text-sm text-zinc-400 mb-4 leading-relaxed max-w-md">Install globally, then run it from any Git repository.</p>
+                        <div class="inline-block bg-white/[0.02] border border-white/5 rounded-lg px-4 py-2 font-mono text-xs text-zinc-400">npm install -g gitnova</div>
+                    </div>
+                </div>
+
+                <div class="flex gap-8 mb-16 relative">
+                    <div class="w-14 h-14 rounded-full bg-black border border-white/10 flex items-center justify-center flex-shrink-0 z-10 shadow-[0_0_15px_rgba(255,255,255,0.05)]"><span class="text-sm font-mono text-zinc-300">02</span></div>
+                    <div class="pt-3">
+                        <h3 class="text-lg font-medium text-zinc-100 mb-2">Choose a provider</h3>
+                        <p class="text-sm text-zinc-400 mb-4 leading-relaxed max-w-md">Use Gemini, DeepSeek, Groq, or Claude. GitNova stores the active API key locally and lets you switch later.</p>
+                        <div class="inline-block bg-white/[0.02] border border-white/5 rounded-lg px-4 py-2 font-mono text-xs text-zinc-400">/provider</div>
+                    </div>
+                </div>
+
+                <div class="flex gap-8 relative">
+                    <div class="w-14 h-14 rounded-full bg-black border border-zinc-500 flex items-center justify-center flex-shrink-0 z-10 shadow-[0_0_20px_rgba(255,255,255,0.1)]"><span class="text-sm font-mono text-zinc-100">03</span></div>
+                    <div class="pt-3">
+                        <h3 class="text-lg font-medium text-zinc-100 mb-2">Use chat or auto mode</h3>
+                        <p class="text-sm text-zinc-400 mb-4 leading-relaxed max-w-md">Talk to it in plain English, or use one command to scan, stage, commit, and push.</p>
+                        <div class="inline-block bg-white/[0.02] border border-zinc-700 rounded-lg px-4 py-2 font-mono text-xs text-zinc-200 shadow-inner">gitnova --auto</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="max-w-5xl mx-auto px-6 mb-28 text-center">
+            <div class="surface-card rounded-[40px] p-12 md:p-24 relative overflow-hidden flex flex-col items-center">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(255,255,255,0.03)_0%,transparent_60%)] pointer-events-none"></div>
+                <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8">
+                    <iconify-icon icon="solar:lock-keyhole-minimalistic-linear" class="text-3xl text-zinc-300" stroke-width="1"></iconify-icon>
+                </div>
+                <h2 class="text-3xl font-medium tracking-tighter text-zinc-100 mb-4">Privacy by design.</h2>
+                <p class="text-base text-zinc-400 max-w-2xl mb-8 leading-relaxed">
+                    The docs say GitNova sends only what is needed to your chosen AI provider and keeps stored keys local in <span class="font-mono text-zinc-300">~/.gitnova-config.json</span>. This section now reflects that positioning instead of generic marketing copy.
+                    <span class="text-zinc-300 block mt-3">Security scans can review file names before staging and before pushing, helping stop secrets and heavy files from slipping through.</span>
+                </p>
+            </div>
+        </section>
+
+        <section id="changelog" class="max-w-5xl mx-auto px-6 mb-28 md:mb-40">
+            <div class="flex flex-col items-center text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/5 text-xs font-medium text-purple-400 mb-6 shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300" id="latest-version-badge">
+                    <iconify-icon icon="solar:cloud-download-linear" class="text-base animate-pulse"></iconify-icon> Loading version info...
+                </div>
+                <h2 class="text-4xl md:text-5xl font-medium tracking-tighter text-zinc-100 mb-6 font-mono">Changelog</h2>
+                <p class="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed font-light">Everything that's new, improved, and fixed in GitNova.</p>
+            </div>
+            
+            <div id="changelog-container" class="space-y-6 md:space-y-12 relative">
+                <div class="absolute left-[32px] md:left-[32px] lg:left-[48px] top-4 bottom-4 w-px bg-gradient-to-b from-white/20 via-white/5 to-transparent z-0 hidden sm:block"></div>
+                <!-- Dynamic changelog will be injected here -->
+            </div>
+        </section>
+
+        <section class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-medium tracking-tighter text-zinc-100 mb-6">Ready to use Git in plain English?</h2>
+            <p class="text-base text-zinc-500 mb-10 max-w-xl mx-auto">Install GitNova, connect your provider, and start using status, branch creation, commits, push flows, onboarding, and slash commands from one CLI.</p>
+            <div class="flex justify-center">
+                <a href="https://www.npmjs.com/package/gitnova" target="_blank" rel="noopener noreferrer" class="h-12 px-8 rounded-full bg-zinc-100 text-zinc-950 text-sm font-medium hover:bg-white hover:scale-[1.02] transition-all shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)] inline-flex items-center">Install Now</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-white/5 mt-20">
+        <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-sm font-medium tracking-[0.22em] text-zinc-500 uppercase">GitNova</div>
+            <div class="text-xs text-zinc-600 flex gap-6">
+                <a href="https://github.com/nourddinak/GitNova" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">GitHub</a>
+                <a href="https://www.npmjs.com/package/gitnova" target="_blank" rel="noopener noreferrer" class="hover:text-zinc-300 transition-colors">npm</a>
+                <a href="#features" class="hover:text-zinc-300 transition-colors">Features</a>
+                <a href="#changelog" class="hover:text-zinc-300 transition-colors">Changelog</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const tabs = document.querySelectorAll('.terminal-tab');
+        const panels = document.querySelectorAll('.terminal-panel');
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.view;
+
+                tabs.forEach((btn) => btn.classList.remove('active'));
+                panels.forEach((panel) => panel.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.querySelector(`[data-panel="${target}"]`)?.classList.add('active');
+            });
+        });
+
+        const copyButton = document.getElementById('copy-install');
+        const installCommand = document.getElementById('install-command');
+
+        copyButton?.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(installCommand.textContent.trim());
+                const original = copyButton.innerHTML;
+                copyButton.innerHTML = '<iconify-icon icon="solar:check-circle-linear" class="text-base" stroke-width="1.5"></iconify-icon>';
+                setTimeout(() => {
+                    copyButton.innerHTML = original;
+                }, 1200);
+            } catch (error) {
+                console.error('Copy failed', error);
+            }
+        });
+
+        // Changelog data embedded inline — always works, even via file://
+        // When served from a web server, a live fetch will override this with the latest data.
+        const CHANGELOG_INLINE = {
+          "1.0.8": {
+            "title": "Welcome to GitNova v1.0.8!",
+            "notes": [
+              "⚡ Inline prompt — run \"gitnova \\\"your request\\\"\" to fire a prompt the moment the session starts, no typing needed",
+              "📢 Live notices — developer can now push messages to all users instantly by editing notices.json on GitHub, no update required"
+            ]
+          },
+          "1.0.7": {
+            "title": "Welcome to GitNova v1.0.7!",
+            "notes": [
+              "🐛 /bugs — Report bugs directly to the developer via GitHub Issues, one step",
+              "🔒 /privacy — View exactly what data GitNova uses and what it never collects",
+              "🗑️ --uninstall — Cleanly delete your config and API keys before uninstalling",
+              "⭐ Star prompt — GitNova asks once to star the repo until you do (takes 1 click!)",
+              "👤 Login display — Startup now shows your GitHub account and Git user identity",
+              "🗂️ /config upgrade — Now shows GitHub account, Git user, and grouped sections",
+              "🎉 What's New panel — Shows release notes once after every update"
+            ]
+          },
+          "1.0.6": {
+            "title": "Welcome to GitNova v1.0.6!",
+            "notes": [
+              "🟣 Claude (Anthropic) provider — claude-opus-4-5, claude-sonnet-4-5, and more",
+              "🌿 /rename-branch — rename current branch locally and remotely in one step",
+              "📊 /stats — view total commits, lines added/removed, and authors",
+              "🗂️ /config — view your saved config and API keys (redacted) from the menu",
+              "💻 --version / -v flag — instantly print GitNova, Git, GitHub CLI and Node versions",
+              "🌍 Linux & macOS support — shell commands now auto-adapt to your OS"
+            ]
+          },
+          "1.0.5": {
+            "title": "Welcome to GitNova v1.0.5!",
+            "notes": [
+              "🚀 Auto Mode: gitnova --auto now stages, AI-commits, and pushes in one command",
+              "🛡️ Security Guard: AI scans staging and push payloads for secrets and bloat",
+              "🩹 Auto-Healing: Git errors are explained by AI and fixes are proposed automatically",
+              "🤖 Multi-provider: Added Groq (fast inference) as a third AI provider",
+              "🔗 Seamless GitHub setup: Missing remotes are auto-detected and fixed on startup"
+            ]
+          }
+        };
+
+        function renderChangelog(data) {
+                
+                const container = document.getElementById('changelog-container');
+                const badge = document.getElementById('latest-version-badge');
+                
+                if (!container) return;
+                
+                const versions = Object.keys(data).sort((a,b) => b.localeCompare(a, undefined, {numeric:true}));
+                
+                if(versions.length > 0 && badge) {
+                    badge.innerHTML = `
+                        <iconify-icon icon="solar:star-fall-bold-duotone" class="text-base"></iconify-icon> 
+                        <span class="tracking-widest uppercase ml-1">Latest: v${versions[0]}</span>
+                    `;
+                }
+                
+                let html = '';
+                versions.forEach((version, index) => {
+                    const release = data[version];
+                    const isLatest = index === 0;
+                    
+                    const titleText = release.title.replace(/^Welcome to GitNova /, '');
+                    
+                    const formatNote = (text) => {
+                        let formatted = text.replace(/"([^"]+)"/g, '<span class="text-zinc-200 font-mono text-[13px] bg-white/5 border border-white/10 px-1.5 py-0.5 rounded">"$1"</span>');
+                        const parts = formatted.split(' ');
+                        const firstPart = parts[0];
+                        const isProbablyEmoji = firstPart.length <= 4 && !/^[a-zA-Z0-9]+$/.test(firstPart) && /[^\w=+-]/.test(firstPart);
+                        
+                        if (isProbablyEmoji) {
+                            return `<span class="mr-3 text-[22px] mt-0 inline-block opacity-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">${firstPart}</span><span class="leading-relaxed text-[15px] pt-0.5">${parts.slice(1).join(' ')}</span>`;
+                        } else {
+                            return `<span class="mr-3 text-lg mt-0.5 inline-block text-zinc-600"><iconify-icon icon="solar:round-alt-arrow-right-linear"></iconify-icon></span><span class="leading-relaxed text-[15px] pt-0.5">${formatted}</span>`;
+                        }
+                    };
+                    
+                    html += `
+                        <div class="surface-card rounded-2xl p-6 md:p-8 relative overflow-hidden transition-all duration-300 hover:border-zinc-700 ${isLatest ? 'border-purple-500/20 hover:border-purple-500/40 ring-1 ring-inset ring-purple-500/10 shadow-[0_0_40px_-15px_rgba(168,85,247,0.2)]' : ''} z-10 w-full sm:w-[calc(100%-1rem)] sm:ml-4 lg:w-[calc(100%-2rem)] lg:ml-8">
+                            ${isLatest ? '<div class="absolute -top-32 -right-32 w-64 h-64 bg-purple-500/10 blur-[80px] rounded-full pointer-events-none z-0"></div>' : ''}
+                            <div class="flex flex-col md:flex-row gap-6 md:gap-12 relative z-10">
+                                <div class="md:w-40 flex-shrink-0 flex flex-row md:flex-col items-center md:items-start justify-between md:justify-start">
+                                    <div class="inline-flex items-center ${isLatest ? 'text-purple-400' : 'text-zinc-500'} font-mono text-2xl font-bold tracking-tight mb-2 md:mb-3">
+                                        <span class="opacity-50 font-normal mr-1">v</span>${version}
+                                    </div>
+                                    ${isLatest ? `<div class="text-[10px] font-bold uppercase tracking-[0.2em] bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full inline-block border border-purple-500/20 shadow-[0_0_10px_rgba(168,85,247,0.2)] whitespace-nowrap">Current Release</div>` : ''}
+                                </div>
+                                <div class="flex-1 w-full">
+                                    <h3 class="text-xl font-medium text-zinc-100 mb-5">${titleText}</h3>
+                                    <ul class="space-y-3.5">
+                                        ${release.notes.map(note => `<li class="flex items-start text-zinc-400">${formatNote(note)}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                
+                // Animate changelog cards after rendering
+                requestAnimationFrame(() => {
+                    gsap.utils.toArray('#changelog-container .surface-card').forEach((card, i) => {
+                        gsap.from(card, {
+                            scrollTrigger: {
+                                trigger: card,
+                                start: "top 85%",
+                                toggleActions: "play none none reverse"
+                            },
+                            opacity: 0,
+                            y: 40,
+                            duration: 0.6,
+                            ease: "power3.out"
+                        });
+                    });
+                });
+        }
+
+        async function fetchChangelog() {
+            // Render inline data immediately — works in all environments including file://
+            renderChangelog(CHANGELOG_INLINE);
+
+            // If running on a real server, silently try to fetch the latest live data
+            if (location.protocol !== 'file:') {
+                try {
+                    const response = await fetch('./CHANGELOG.json');
+                    if (response.ok) {
+                        const liveData = await response.json();
+                        renderChangelog(liveData);
+                    }
+                } catch (_) {
+                    // Live fetch failed — inline data is already rendered, no action needed
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchChangelog();
+
+            // GSAP Animations Initialization
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Animations (Immediate)
+            const heroTl = gsap.timeline();
+            heroTl.from(".hero-badge", { opacity: 0, y: -20, duration: 0.8, ease: "power3.out" })
+                  .from("h1.text-gradient", { opacity: 0, y: 30, duration: 0.8, ease: "power3.out" }, "-=0.4")
+                  .from("p.max-w-3xl", { opacity: 0, y: 20, duration: 0.8, ease: "power3.out" }, "-=0.4")
+                  .from(".hero-buttons", { opacity: 0, y: 20, duration: 0.8, ease: "power3.out" }, "-=0.4")
+                  .from(".max-w-5xl.surface-card", { opacity: 0, y: 40, duration: 1, ease: "power3.out" }, "-=0.4");
+
+            // Providers Section
+            gsap.from("#providers span", {
+                scrollTrigger: { trigger: "#providers", start: "top 90%" },
+                opacity: 0, y: 20, stagger: 0.1, duration: 0.6, ease: "power2.out"
+            });
+
+            // Features Details (Staggered)
+            gsap.utils.toArray('#features details').forEach((detail, i) => {
+                gsap.from(detail, {
+                    scrollTrigger: { trigger: detail, start: "top 85%", toggleActions: "play none none reverse" },
+                    opacity: 0, x: -30, duration: 0.6, ease: "power2.out"
+                });
+            });
+
+            // Feature Mockup
+            gsap.from('#features .min-h-\\[440px\\] .surface-card', {
+                scrollTrigger: { trigger: '#features', start: "top 60%", toggleActions: "play none none reverse" },
+                opacity: 0, scale: 0.95, duration: 0.8, ease: "power3.out"
+            });
+
+            // Fix Git Problems Section
+            gsap.from('#fix-git-problems .surface-card', {
+                scrollTrigger: { trigger: '#fix-git-problems', start: "top 80%", toggleActions: "play none none reverse" },
+                opacity: 0, y: 40, duration: 0.8, ease: "power3.out"
+            });
+
+            // Workflow Timeline Items
+            gsap.utils.toArray('#workflow .flex.gap-8').forEach((item) => {
+                gsap.from(item, {
+                    scrollTrigger: { trigger: item, start: "top 85%", toggleActions: "play none none reverse" },
+                    opacity: 0, x: 30, duration: 0.6, ease: "power2.out"
+                });
+            });
+
+            // Security Section
+            gsap.from('#security .surface-card', {
+                scrollTrigger: { trigger: '#security', start: "top 80%", toggleActions: "play none none reverse" },
+                opacity: 0, scale: 0.95, duration: 0.8, ease: "power3.out"
+            });
+        });
+    </script>
+</body>
+</html>

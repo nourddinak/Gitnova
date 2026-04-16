@@ -1,6 +1,26 @@
-# GitNova — AI-Powered Git & GitHub CLI
+<div align="center">
+  <img src="./logo.png" width="180" alt="GitNova Logo"/>
 
-> **GitNova** turns Git into a conversation. Type plain English, press `/` for a power menu, or run a single command to auto-commit and push — all backed by AI and built-in security scanning.
+  <h1>GitNova</h1>
+  <p><b>The AI-Powered Git & GitHub CLI</b></p>
+
+  <p>
+    <!-- Awesome Badges -->
+    <a href="#"><img src="https://img.shields.io/badge/Awesome-CLI_Apps-ff69b4?style=for-the-badge&logo=awesome-lists" alt="Awesome CLI" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Awesome-AI_Tools-8a2be2?style=for-the-badge&logo=awesome-lists" alt="Awesome AI Tools" /></a>
+    <a href="#"><img src="https://img.shields.io/badge/Awesome-Git-f1502f?style=for-the-badge&logo=git" alt="Awesome Git" /></a>
+    <br/>
+    <!-- Stats & Installs -->
+    <a href="https://www.npmjs.com/package/gitnova"><img src="https://img.shields.io/npm/v/gitnova?color=cb3837&style=for-the-badge&logo=npm" alt="NPM Version" /></a>
+    <a href="https://www.npmjs.com/package/gitnova"><img src="https://img.shields.io/npm/dt/gitnova?style=for-the-badge&color=2ea44f" alt="NPM Downloads" /></a>
+    <a href="https://github.com/nourddinak/GitNova/stargazers"><img src="https://img.shields.io/github/stars/nourddinak/GitNova?style=for-the-badge&color=e3b341&logo=github" alt="GitHub stars" /></a>
+  </p>
+
+  <p><em>Turn Git into a conversation. Type plain English, press <code>/</code> for a power menu, or run a single command to auto-commit and push. Stop fighting git — start talking to it.</em></p>
+
+  <!-- 🚨 IMPORTANT: REPLACE THIS NEXT LINE WITH A LINK TO YOUR RECORDED GIF! 🚨 -->
+  <img src="https://via.placeholder.com/800x400/000000/a855f7?text=Drop+Your+Terminal+GIF+Demo+Here" width="100%" style="border-radius: 8px; border: 1px solid #333;" alt="GitNova Terminal Recording"/>
+</div>
 
 ---
 

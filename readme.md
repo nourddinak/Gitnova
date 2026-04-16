@@ -18,8 +18,9 @@
 
   <p><em>Turn Git into a conversation. Type plain English, press <code>/</code> for a power menu, or run a single command to auto-commit and push. Stop fighting git — start talking to it.</em></p>
 
-  <!-- 🚨 IMPORTANT: REPLACE THIS NEXT LINE WITH A LINK TO YOUR RECORDED GIF! 🚨 -->
-  <img src="https://via.placeholder.com/800x400/000000/a855f7?text=Drop+Your+Terminal+GIF+Demo+Here" width="100%" style="border-radius: 8px; border: 1px solid #333;" alt="GitNova Terminal Recording"/>
+  <a href="#-interactive-chat--natural-language-commands">
+    <img src="./demo.png" width="100%" style="border-radius: 8px; border: 1px solid #333;" alt="GitNova Auto Mode in Action"/>
+  </a>
 </div>
 
 ---
